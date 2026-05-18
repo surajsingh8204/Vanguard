@@ -56,7 +56,10 @@ class VectorStore:
             results.append({
                 "text": item["text"],
                 "cluster": item["cluster"],
+                "subcluster": item.get("subcluster", 0),
                 "score": float(distances[0][i])
+                
+
             })
 
         return results
@@ -88,7 +91,10 @@ class VectorStore:
             results.append({
                 "text": item["text"],
                 "cluster": item["cluster"],
+                "subcluster": item.get("subcluster", 0),
                 "score": float(scores[i])
+                
+
             })
 
         return results
