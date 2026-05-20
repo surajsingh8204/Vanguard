@@ -7,6 +7,8 @@ from intelligence.rag_engine import RAGEngine
 
 from processing.hdbscan_cluster import HDBSCANClusterer
 from processing.subcluster import SubClusterer
+from analytics.cluster_labeler import ClusterLabeler
+from processing.document_purifier import DocumentPurifier
 
 
 class AIPipeline:
@@ -48,14 +50,28 @@ class AIPipeline:
         print("Building vector database...")
 
         all_chunks = []
+        purifier = DocumentPurifier()
 
         for article in articles:
 
             if not article.get("content"):
                 continue
+            
+            #---------------------------------------------------
+            # PURIFY DOCUMENT
+            #---------------------------------------------------
+            cleaned = purifier.clean(article["content"])
 
-            chunks = self.chunk_text(article["content"])
-
+            #---------------------------------------------------
+            # QUALITY CHECK
+            #---------------------------------------------------
+            if not purifier.is_valid(cleaned):
+                continue
+            
+            #---------------------------------------------------
+            # CHUNKING
+            #---------------------------------------------------
+            chunks = self.chunk_text(cleaned)
             all_chunks.extend(chunks)
 
         print("Total chunks:", len(all_chunks))
@@ -71,6 +87,10 @@ class AIPipeline:
         # ---------------------------------------------------
 
         print("Running main narrative clustering...")
+
+        labeler = ClusterLabeler()
+
+        self.cluster_labels = {}
 
         clusterer = HDBSCANClusterer(
             min_cluster_size=12,
@@ -112,6 +132,16 @@ class AIPipeline:
         filtered_embeddings = []
 
         for main_cluster, items in cluster_groups.items():
+
+            # ---------------------------------------------------
+            # GENERATE MAIN CLUSTER LABEL
+            # ---------------------------------------------------
+
+            cluster_texts = [x["text"] for x in items]
+
+            cluster_label = labeler.generate_label(cluster_texts)
+
+            self.cluster_labels[int(main_cluster)] = cluster_label
 
             cluster_embeddings = [x["embedding"] for x in items]
 
@@ -191,7 +221,13 @@ class AIPipeline:
             for c in Counter(clusters).most_common(2)
         ]
 
-        print("\n🎯 Top Clusters:", top_clusters)
+        print("\n🎯 Top Narrative Clusters:\n")
+
+        for cid in top_clusters:
+
+            label = self.cluster_labels.get(cid, "Unknown")
+
+            print(f"Cluster {cid}: {label}")
 
         # ---------------------------------------------------
         # CLUSTER-LEVEL SEARCH
@@ -229,8 +265,10 @@ class AIPipeline:
 
         for r in results:
 
+            label = self.cluster_labels.get(r["cluster"], "Unknown")
+
             print(
-                f"Cluster: {r['cluster']} | "
+                f"Cluster: {r['cluster']} ({label}) | "
                 f"Subcluster: {r.get('subcluster', 0)} | "
                 f"Score: {r['score']:.4f}"
             )
