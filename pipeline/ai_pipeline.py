@@ -9,6 +9,7 @@ from processing.hdbscan_cluster import HDBSCANClusterer
 from processing.subcluster import SubClusterer
 from analytics.cluster_labeler import ClusterLabeler
 from processing.document_purifier import DocumentPurifier
+from analytics.timeline_engine import TimelineEngine
 
 
 class AIPipeline:
@@ -72,7 +73,13 @@ class AIPipeline:
             # CHUNKING
             #---------------------------------------------------
             chunks = self.chunk_text(cleaned)
-            all_chunks.extend(chunks)
+            article_date = article.get("date", "unknown")
+            for chunk in chunks:
+
+                all_chunks.append({
+                    "text": chunk,
+                    "date": article_date
+                })
 
         print("Total chunks:", len(all_chunks))
 
@@ -80,7 +87,9 @@ class AIPipeline:
         # EMBEDDINGS
         # ---------------------------------------------------
 
-        embeddings = self.embedding_service.embed(all_chunks)
+        texts = [x["text"] for x in all_chunks]
+
+        embeddings = self.embedding_service.embed(texts)
 
         # ---------------------------------------------------
         # MAIN CLUSTERING
@@ -115,7 +124,8 @@ class AIPipeline:
 
             cluster_groups[label].append({
                 "text": all_chunks[i],
-                "embedding": embeddings[i]
+                "embedding": embeddings[i],
+                "date": all_chunks[i]["date"]
             })
 
         print("Main clusters found:", len(cluster_groups))
@@ -137,9 +147,14 @@ class AIPipeline:
             # GENERATE MAIN CLUSTER LABEL
             # ---------------------------------------------------
 
-            cluster_texts = [x["text"] for x in items]
+            cluster_texts = [
+                x["text"]["text"]
+                for x in items
+            ]
 
-            cluster_label = labeler.generate_label(cluster_texts)
+            cluster_label = labeler.generate_label(
+                cluster_texts
+                )
 
             self.cluster_labels[int(main_cluster)] = cluster_label
 
@@ -171,7 +186,8 @@ class AIPipeline:
                 clustered_chunks.append({
                     "text": item["text"],
                     "cluster": int(main_cluster),
-                    "subcluster": int(sub_labels[idx])
+                    "subcluster": int(sub_labels[idx]),
+                    "date": item["date"]
                 })
 
                 filtered_embeddings.append(item["embedding"])
@@ -190,6 +206,8 @@ class AIPipeline:
             filtered_embeddings,
             clustered_chunks
         )
+
+        self.clustered_chunks = clustered_chunks
 
         print(
             "Vector DB built with",
@@ -273,7 +291,7 @@ class AIPipeline:
                 f"Score: {r['score']:.4f}"
             )
 
-            print(r["text"][:200])
+            print(r["text"]["text"][:200])
 
             print("-" * 50)
 
@@ -282,7 +300,8 @@ class AIPipeline:
         # ---------------------------------------------------
 
         context = "\n\n".join([
-            r["text"] for r in results
+            r["text"]["text"] 
+            for r in results
         ])
 
         # ---------------------------------------------------
@@ -313,6 +332,13 @@ class AIPipeline:
             articles = json.load(f)
 
         self.build_vector_db(articles)
+
+        timeline_engine = TimelineEngine()
+        timeline_engine.build(
+            self.clustered_chunks,
+            self.cluster_labels
+        )
+        timeline_engine.display()
 
         print("Ready for queries!\n")
 
