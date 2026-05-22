@@ -10,6 +10,7 @@ from processing.subcluster import SubClusterer
 from analytics.cluster_labeler import ClusterLabeler
 from processing.document_purifier import DocumentPurifier
 from analytics.timeline_engine import TimelineEngine
+from analytics.evaluation_engine import EvaluationEngine
 
 
 class AIPipeline:
@@ -83,6 +84,9 @@ class AIPipeline:
 
         print("Total chunks:", len(all_chunks))
 
+        if len(all_chunks) == 0:
+            raise ValueError("No valid chunks found after document purification.")
+
         # ---------------------------------------------------
         # EMBEDDINGS
         # ---------------------------------------------------
@@ -123,13 +127,14 @@ class AIPipeline:
                 cluster_groups[label] = []
 
             cluster_groups[label].append({
-                "text": all_chunks[i],
+                "text": all_chunks[i]["text"],
                 "embedding": embeddings[i],
                 "date": all_chunks[i]["date"]
             })
 
         print("Main clusters found:", len(cluster_groups))
-
+        self.cluster_groups = cluster_groups
+        
         # ---------------------------------------------------
         # SUBCLUSTERING
         # ---------------------------------------------------
@@ -148,7 +153,7 @@ class AIPipeline:
             # ---------------------------------------------------
 
             cluster_texts = [
-                x["text"]["text"]
+                x["text"]
                 for x in items
             ]
 
@@ -168,7 +173,8 @@ class AIPipeline:
                     clustered_chunks.append({
                         "text": item["text"],
                         "cluster": int(main_cluster),
-                        "subcluster": 0
+                        "subcluster": 0,
+                        "date": item["date"]
                     })
 
                     filtered_embeddings.append(item["embedding"])
@@ -193,6 +199,9 @@ class AIPipeline:
                 filtered_embeddings.append(item["embedding"])
 
         print("After noise removal:", len(clustered_chunks))
+
+        if len(filtered_embeddings) == 0:
+            raise ValueError("No clustered chunks found after noise removal.")
 
         # ---------------------------------------------------
         # VECTOR DATABASE
@@ -291,7 +300,7 @@ class AIPipeline:
                 f"Score: {r['score']:.4f}"
             )
 
-            print(r["text"]["text"][:200])
+            print(r["text"][:200])
 
             print("-" * 50)
 
@@ -300,7 +309,7 @@ class AIPipeline:
         # ---------------------------------------------------
 
         context = "\n\n".join([
-            r["text"]["text"] 
+            r["text"] 
             for r in results
         ])
 
@@ -339,6 +348,31 @@ class AIPipeline:
             self.cluster_labels
         )
         timeline_engine.display()
+
+        # ---------------------------------------------------
+        # EVALUATION
+        # ---------------------------------------------------
+
+        evaluator = EvaluationEngine()
+
+        coherence = evaluator.cluster_coherence(
+            self.cluster_groups
+        )
+
+        separation = evaluator.cluster_separation(
+            self.cluster_groups
+        )
+
+        purity = evaluator.narrative_purity(
+            self.cluster_groups
+        )
+
+        evaluator.display_report(
+            coherence,
+            separation,
+            purity,
+            self.cluster_labels
+        )
 
         print("Ready for queries!\n")
 
