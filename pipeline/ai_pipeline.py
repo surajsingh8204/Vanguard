@@ -11,6 +11,8 @@ from analytics.cluster_labeler import ClusterLabeler
 from processing.document_purifier import DocumentPurifier
 from analytics.timeline_engine import TimelineEngine
 from analytics.evaluation_engine import EvaluationEngine
+from analytics.spike_detector import SpikeDetector
+from analytics.evolution_engine import EvolutionEngine
 
 
 class AIPipeline:
@@ -348,6 +350,32 @@ class AIPipeline:
             self.cluster_labels
         )
         timeline_engine.display()
+
+        # ---------------------------------------------------
+        # SPIKE DETECTION
+        # ---------------------------------------------------
+
+        spike_detector = SpikeDetector()
+
+        spikes = spike_detector.detect(
+            timeline_engine.timeline
+        )
+
+        spike_detector.display(spikes)
+
+        #---------------------------------------------------
+        #NARRATIVE EVOLUTION
+        #---------------------------------------------------
+        evolution_engine = EvolutionEngine()
+        temporal_clusters = evolution_engine.build_temporal_clusters(
+            self.clustered_chunks,
+            self.cluster_labels
+        )
+        evolution_report = evolution_engine.detect_evolution(
+            temporal_clusters   
+        )
+        evolution_engine.display(evolution_report)
+        
 
         # ---------------------------------------------------
         # EVALUATION
