@@ -151,7 +151,15 @@ def mark_processed(filename):
 # 🚀 MAIN RUN
 def run():
 
-    urls = generate_feed_urls(hours_back=3)  # 🔥 change to 6/12/24 later
+    HOURS_BACK = 24
+
+    urls = generate_feed_urls(
+        hours_back=HOURS_BACK
+    )
+    print(
+         f"Processing {len(urls)} feeds "
+         f"from last {HOURS_BACK} hours"
+    )
 
     processed = load_processed()
 

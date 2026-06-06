@@ -5,14 +5,22 @@ from embeddings.embedding_services import EmbeddingService
 from vectorstore.faiss_store import VectorStore
 from intelligence.rag_engine import RAGEngine
 
-from processing.hdbscan_cluster import HDBSCANClusterer
-from processing.subcluster import SubClusterer
+from clustering.hdbscan_cluster import HDBSCANClusterer
+from clustering.subcluster import SubClusterer
 from analytics.cluster_labeler import ClusterLabeler
 from processing.document_purifier import DocumentPurifier
 from analytics.timeline_engine import TimelineEngine
 from analytics.evaluation_engine import EvaluationEngine
 from analytics.spike_detector import SpikeDetector
 from analytics.evolution_engine import EvolutionEngine
+from logger.evaluation_logger import EvaluationLogger
+from analytics.graphs.topk_graph import TopKGraph
+from analytics.graphs.graph_diagnostics import GraphDiagnostics
+from analytics.graphs.community_detector import CommunityDetector
+from analytics.graphs.centrality_analyzer import CentralityAnalyzer
+from analytics.narrative_statistics import NarrativeStatistics
+from analytics.influence_engine import InfluenceEngine
+from analytics.graphs.influence_mapper import InfluenceMapper
 
 
 class AIPipeline:
@@ -26,6 +34,7 @@ class AIPipeline:
         self.rag = RAGEngine()
 
         self.vector_store = None
+        self.evaluation_logger = EvaluationLogger()
 
     # ---------------------------------------------------
     # TEXT CHUNKING
@@ -113,6 +122,8 @@ class AIPipeline:
         )
 
         labels = clusterer.cluster(embeddings)
+
+        
 
         # ---------------------------------------------------
         # GROUP BY MAIN CLUSTER
@@ -202,9 +213,12 @@ class AIPipeline:
 
         print("After noise removal:", len(clustered_chunks))
 
+        # Save for analytics modules
+        self.clustered_chunks = clustered_chunks
+
         if len(filtered_embeddings) == 0:
             raise ValueError("No clustered chunks found after noise removal.")
-
+        
         # ---------------------------------------------------
         # VECTOR DATABASE
         # ---------------------------------------------------
@@ -285,6 +299,49 @@ class AIPipeline:
         )
 
         results = all_results[:5]
+        # ---------------------------------------------
+        # RETRIEVAL CONFIDENCE CHECK
+        # ---------------------------------------------
+        scores = [r["score"] for r in results]
+
+        avg_score = sum(scores) / len(scores)
+
+        print(
+            f"\n🎯 Average Retrieval Confidence: "
+            f"{avg_score:.4f}"
+        )
+
+        if avg_score < 0.30:
+
+            return (
+                "Insufficient narrative evidence found "
+                "in the current media corpus."
+            )
+
+        print("\n📊 Retrieval Stats")
+
+        print(
+            f"Max Score: {max(scores):.4f}"
+        )
+
+        print(
+            f"Average Score: {avg_score:.4f}"
+        )
+
+        print(
+            f"Min Score: {min(scores):.4f}"
+        )
+
+        retrieval_stats = {
+
+            "question": question,
+
+            "max_score": max(scores),
+
+            "avg_score": avg_score,
+
+            "min_score": min(scores)
+        }
 
         # ---------------------------------------------------
         # DISPLAY
@@ -324,13 +381,14 @@ class AIPipeline:
             question
         )
 
-        return answer
+        return answer, retrieval_stats
 
     # ---------------------------------------------------
     # MAIN LOOP
     # ---------------------------------------------------
 
     def run(self):
+        logger = EvaluationLogger()
 
         print("Loading processed data...")
 
@@ -363,6 +421,11 @@ class AIPipeline:
 
         spike_detector.display(spikes)
 
+        logger.save(
+            "spike_report",
+            spikes
+        )
+
         #---------------------------------------------------
         #NARRATIVE EVOLUTION
         #---------------------------------------------------
@@ -375,7 +438,11 @@ class AIPipeline:
             temporal_clusters   
         )
         evolution_engine.display(evolution_report)
-        
+
+        logger.save(
+            "evolution_report",
+            evolution_report
+        )
 
         # ---------------------------------------------------
         # EVALUATION
@@ -402,6 +469,124 @@ class AIPipeline:
             self.cluster_labels
         )
 
+        logger.save(
+            "coherence_scores",
+            coherence
+        )
+
+        logger.save(
+            "purity_scores",
+            purity
+        )
+
+        logger.save(
+            "cluster_labels",
+            self.cluster_labels
+        )
+
+        logger.save(
+            "timeline_report",
+            timeline_engine.timeline
+        )
+
+        # ---------------------------------------------------
+        # NARRATIVE GRAPH
+        # ---------------------------------------------------
+
+        graph_engine = TopKGraph(k=3, min_similarity=0.30)
+
+        graph = graph_engine.build(
+
+            self.cluster_groups,
+
+            self.cluster_labels
+        )
+
+        graph_engine.display_summary()
+
+        community_detector = CommunityDetector()
+
+        communities = community_detector.detect(
+            graph
+        )
+
+        community_detector.display(
+            communities,
+            graph
+        )
+
+
+        centrality = CentralityAnalyzer()
+
+        centrality_results = centrality.analyze(
+            graph
+        )
+
+        centrality.display(
+            graph,
+            centrality_results
+        )
+
+        stats_engine = NarrativeStatistics()
+
+        narrative_stats = stats_engine.generate(
+            self.clustered_chunks,
+            self.cluster_labels
+        )
+
+        stats_engine.display(
+            narrative_stats
+        )
+
+        influence_engine = InfluenceEngine()
+
+        influence_scores = (
+
+            influence_engine.calculate(
+
+                narrative_stats,
+
+                centrality_results
+            )
+        )
+
+        influence_engine.display(
+            influence_scores
+        )
+
+
+        mapper = InfluenceMapper()
+
+        mappings = mapper.generate(
+            graph,
+            influence_scores
+        )
+
+        mapper.display(
+            mappings
+        )
+        
+        # ---------------------------------------------------
+        # GRAPH DIAGNOSTICS
+        # ---------------------------------------------------
+
+        diagnostics_engine = GraphDiagnostics()
+
+        diagnostics = diagnostics_engine.analyze(
+
+            self.cluster_groups,
+
+            self.cluster_labels
+        )
+
+        diagnostics_engine.display(diagnostics)
+        logger.save(
+            "graph_diagnostics",
+            diagnostics
+        )
+
+
+
         print("Ready for queries!\n")
 
         while True:
@@ -411,7 +596,9 @@ class AIPipeline:
             if q.lower() == "exit":
                 break
 
-            response = self.query(q)
+            response, retrieval_stats = self.query(q)
+            
+
 
             print("\n🧠 Intelligence Report:\n")
 

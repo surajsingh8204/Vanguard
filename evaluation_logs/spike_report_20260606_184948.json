@@ -1,0 +1,23 @@
+[
+    {
+        "narrative": "President navigates Iran oil crisis.",
+        "day": "2026-05-19",
+        "count": 23,
+        "momentum": 4.6,
+        "z_score": 1.4
+    },
+    {
+        "narrative": "Global Energy Shifts and Economic Impact",
+        "day": "2026-04-17",
+        "count": 23,
+        "momentum": 23.0,
+        "z_score": 1.0
+    },
+    {
+        "narrative": "American Pride in the National Flag",
+        "day": "2026-05-19",
+        "count": 12,
+        "momentum": 12.0,
+        "z_score": 1.0
+    }
+]
