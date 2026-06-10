@@ -85,6 +85,8 @@ class SpikeDetector:
 
                     "count": latest_count,
 
+                    "volume": sum(counts),
+
                     "momentum": round(
                         float(momentum),
                         2

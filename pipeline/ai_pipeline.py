@@ -9,18 +9,19 @@ from clustering.hdbscan_cluster import HDBSCANClusterer
 from clustering.subcluster import SubClusterer
 from analytics.cluster_labeler import ClusterLabeler
 from processing.document_purifier import DocumentPurifier
-from analytics.timeline_engine import TimelineEngine
-from analytics.evaluation_engine import EvaluationEngine
-from analytics.spike_detector import SpikeDetector
-from analytics.evolution_engine import EvolutionEngine
+from analytics.narrative.timeline_engine import TimelineEngine
+from analytics.evaluation.evaluation_engine import EvaluationEngine
+from analytics.narrative.spike_detector import SpikeDetector
+from analytics.narrative.evolution_engine import EvolutionEngine
 from logger.evaluation_logger import EvaluationLogger
 from analytics.graphs.topk_graph import TopKGraph
 from analytics.graphs.graph_diagnostics import GraphDiagnostics
 from analytics.graphs.community_detector import CommunityDetector
 from analytics.graphs.centrality_analyzer import CentralityAnalyzer
-from analytics.narrative_statistics import NarrativeStatistics
+from analytics.narrative.narrative_statistics import NarrativeStatistics
 from analytics.influence_engine import InfluenceEngine
 from analytics.graphs.influence_mapper import InfluenceMapper
+from analytics.narrative.emerging_narrative_detector import EmergingNarrativeDetector
 
 
 class AIPipeline:
@@ -425,6 +426,25 @@ class AIPipeline:
             "spike_report",
             spikes
         )
+
+
+        # ---------------------------------------------------
+        # EMERGING NARRATIVE DETECTION
+        #---------------------------------------------------
+        emerging_detector = EmergingNarrativeDetector()
+
+        emerging_narratives = emerging_detector.detect(
+            spikes
+        )
+        emerging_detector.display(
+            emerging_narratives
+        )
+        logger.save(
+            "emerging_narratives",
+            emerging_narratives
+        )
+
+
 
         #---------------------------------------------------
         #NARRATIVE EVOLUTION
