@@ -22,6 +22,7 @@ from analytics.narrative.narrative_statistics import NarrativeStatistics
 from analytics.influence_engine import InfluenceEngine
 from analytics.graphs.influence_mapper import InfluenceMapper
 from analytics.narrative.emerging_narrative_detector import EmergingNarrativeDetector
+from analytics.narrative.forecast_engine import ForecastEngine
 
 
 class AIPipeline:
@@ -116,6 +117,7 @@ class AIPipeline:
         labeler = ClusterLabeler()
 
         self.cluster_labels = {}
+        self.initial_cluster_labels = {}
 
         clusterer = HDBSCANClusterer(
             min_cluster_size=12,
@@ -123,6 +125,10 @@ class AIPipeline:
         )
 
         labels = clusterer.cluster(embeddings)
+
+
+        
+
 
         
 
@@ -175,12 +181,24 @@ class AIPipeline:
                 cluster_texts
                 )
 
-            self.cluster_labels[int(main_cluster)] = cluster_label
+            self.initial_cluster_labels[
+                int(main_cluster)
+            ] = cluster_label
+
+
+            if not hasattr(self, "subcluster_labels"):
+                self.subcluster_labels = {}
+
+            self.subcluster_labels[int(main_cluster)] = {}
 
             cluster_embeddings = [x["embedding"] for x in items]
 
             # small clusters skip subclustering
             if len(cluster_embeddings) < 5:
+
+                self.subcluster_labels[
+                    int(main_cluster)
+                ][0] = cluster_label
 
                 for item in items:
 
@@ -199,7 +217,44 @@ class AIPipeline:
             # RUN SUBCLUSTERING
             # ---------------------------------------------
 
-            sub_labels = subclusterer.cluster(cluster_embeddings)
+            sub_labels = subclusterer.cluster(
+                cluster_embeddings
+            )
+
+            from collections import defaultdict
+
+            subcluster_groups = defaultdict(list)
+
+            for idx, sub_id in enumerate(sub_labels):
+
+                if sub_id == -1:
+                    continue
+
+                subcluster_groups[sub_id].append(
+                    items[idx]["text"]
+                )
+
+            # ---------------------------------------------
+            # GENERATE SUBCLUSTER LABELS
+            # ---------------------------------------------
+
+            for sub_id, texts in subcluster_groups.items():
+
+                try:
+
+                    sub_label = labeler.generate_label(
+                        texts[:20]
+                    )
+
+                except Exception:
+
+                    sub_label = (
+                        f"Subcluster {sub_id}"
+                    )
+
+                self.subcluster_labels[
+                    int(main_cluster)
+                ][int(sub_id)] = sub_label
 
             for idx, item in enumerate(items):
 
@@ -212,7 +267,106 @@ class AIPipeline:
 
                 filtered_embeddings.append(item["embedding"])
 
+        print("\n📌 SAMPLE SUBCLUSTER LABELS\n")
+
+        shown = 0
+
+        for cluster_id, subs in self.subcluster_labels.items():
+
+            print(
+                f"\nMain Cluster {cluster_id}"
+            )
+
+            for sub_id, label in subs.items():
+
+                print(
+                    f"   Subcluster {sub_id}: {label}"
+                )
+
+            shown += 1
+
+            if shown >= 5:
+                break
+
+        print("\n🔄 Rebuilding Main Cluster Labels...\n")
+
+        for cluster_id, subclusters in self.subcluster_labels.items():
+
+            sub_labels = list(
+                subclusters.values()
+            )
+
+            if len(sub_labels) == 0:
+
+                self.cluster_labels[
+                    cluster_id
+                ] = self.initial_cluster_labels.get(
+                    cluster_id,
+                    "Unknown Narrative"
+                )
+
+                continue
+
+            try:
+
+                rebuilt_label = (
+                    labeler.generate_label(
+                        sub_labels
+                    )
+                )
+
+            except Exception:
+
+                rebuilt_label = (
+                    self.initial_cluster_labels.get(
+                        cluster_id,
+                        "Unknown Narrative"
+                    )
+                )
+
+            self.cluster_labels[
+                cluster_id
+            ] = rebuilt_label
+
+            print(
+                f"Cluster {cluster_id}"
+            )
+
+            print(
+                f"Old: {self.initial_cluster_labels.get(cluster_id)}"
+            )
+
+            print(
+                f"New: {rebuilt_label}"
+            )
+
+            print("-" * 40)
+
         print("After noise removal:", len(clustered_chunks))
+
+        # ---------------------------------------------------
+        # SUBCLUSTER LABELING SANITY CHECK
+        # ---------------------------------------------------
+
+        print(
+            "Total Main Clusters:",
+            len(self.subcluster_labels)
+        )
+
+        total_subs = sum(
+            len(v)
+            for v in self.subcluster_labels.values()
+        )
+
+        print(
+            "Total Subclusters:",
+            total_subs
+        )
+
+        self.evaluation_logger.save(
+            "subcluster_labels",
+            self.subcluster_labels
+        )
 
         # Save for analytics modules
         self.clustered_chunks = clustered_chunks
@@ -269,9 +423,30 @@ class AIPipeline:
 
         for cid in top_clusters:
 
-            label = self.cluster_labels.get(cid, "Unknown")
+            label = self.cluster_labels.get(
+                cid,
+                "Unknown"
+            )
 
-            print(f"Cluster {cid}: {label}")
+            print(
+                f"🧠 {label}"
+            )
+
+            subtopics = list(
+
+                self.subcluster_labels
+                    .get(cid, {})
+                    .values()
+
+            )[:3]
+
+            for topic in subtopics:
+
+                print(
+                    f"   • {topic}"
+                )
+
+            print()
 
         # ---------------------------------------------------
         # CLUSTER-LEVEL SEARCH
@@ -307,9 +482,25 @@ class AIPipeline:
 
         avg_score = sum(scores) / len(scores)
 
+        if avg_score >= 0.70:
+
+            confidence_level = "High"
+
+        elif avg_score >= 0.50:
+
+            confidence_level = "Medium"
+
+        else:
+
+            confidence_level = "Low"
+
         print(
-            f"\n🎯 Average Retrieval Confidence: "
-            f"{avg_score:.4f}"
+            f"\n🎯 Retrieval Confidence: "
+            f"{confidence_level}"
+        )
+
+        print(
+            f"Score: {avg_score:.4f}"
         )
 
         if avg_score < 0.30:
@@ -348,16 +539,46 @@ class AIPipeline:
         # DISPLAY
         # ---------------------------------------------------
 
-        print("\n🔍 Retrieved Context:\n")
+        print(
+            "\n🔍 Supporting Narrative Evidence:\n"
+        )
 
         for r in results:
 
-            label = self.cluster_labels.get(r["cluster"], "Unknown")
+            cluster_id = r["cluster"]
+
+            subcluster_id = r.get(
+                "subcluster",
+                0
+            )
+
+            cluster_label = self.cluster_labels.get(
+                cluster_id,
+                "Unknown"
+            )
+
+            subcluster_label = (
+                self.subcluster_labels
+                    .get(cluster_id, {})
+                    .get(
+                        subcluster_id,
+                        "Unknown"
+                    )
+            )
 
             print(
-                f"Cluster: {r['cluster']} ({label}) | "
-                f"Subcluster: {r.get('subcluster', 0)} | "
-                f"Score: {r['score']:.4f}"
+                f"📂 Narrative Domain: "
+                f"{cluster_label}"
+            )
+
+            print(
+                f"🎯 Specific Topic: "
+                f"{subcluster_label}"
+            )
+
+            print(
+                f"📊 Confidence: "
+                f"{r['score']:.4f}"
             )
 
             print(r["text"][:200])
@@ -443,8 +664,6 @@ class AIPipeline:
             "emerging_narratives",
             emerging_narratives
         )
-
-
 
         #---------------------------------------------------
         #NARRATIVE EVOLUTION
@@ -584,6 +803,31 @@ class AIPipeline:
 
         mapper.display(
             mappings
+        )
+
+        # ---------------------------------------------------
+        # NARRATIVE FORECASTING
+        # ---------------------------------------------------
+
+        forecast_engine = ForecastEngine()
+
+        forecasts = forecast_engine.forecast(
+
+            timeline_engine.timeline,
+
+            influence_scores,
+
+            emerging_narratives
+
+        )
+
+        forecast_engine.display(
+            forecasts
+        )
+
+        logger.save(
+            "forecast_report",
+            forecasts
         )
         
         # ---------------------------------------------------

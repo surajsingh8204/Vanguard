@@ -1,0 +1,90 @@
+[
+    {
+        "narrative": "Global Oil Markets Reel from Ukraine War.",
+        "day": "2026-06-05",
+        "count": 7,
+        "volume": 47,
+        "momentum": 7.0,
+        "z_score": -0.2
+    },
+    {
+        "narrative": "Kim's Joyful Asia Music Tour Begins",
+        "day": "2026-06-06",
+        "count": 11,
+        "volume": 13,
+        "momentum": 11.0,
+        "z_score": 1.41
+    },
+    {
+        "narrative": "Country Legend's Enduring Musical Legacy",
+        "day": "2026-06-05",
+        "count": 20,
+        "volume": 42,
+        "momentum": 2.0,
+        "z_score": 1.39
+    },
+    {
+        "narrative": "Guerrilla War in Occupied Eastern Europe",
+        "day": "2026-06-06",
+        "count": 44,
+        "volume": 45,
+        "momentum": 44.0,
+        "z_score": 1.0
+    },
+    {
+        "narrative": "Rare Earth Investment Opportunities",
+        "day": "2026-06-05",
+        "count": 6,
+        "volume": 13,
+        "momentum": 3.0,
+        "z_score": 0.98
+    },
+    {
+        "narrative": "Protecting the Environment through Recycling",
+        "day": "2026-06-05",
+        "count": 10,
+        "volume": 17,
+        "momentum": 5.0,
+        "z_score": 1.31
+    },
+    {
+        "narrative": "Trump's Embarrassing Presidential Blunder",
+        "day": "2026-06-06",
+        "count": 10,
+        "volume": 12,
+        "momentum": 10.0,
+        "z_score": 1.41
+    },
+    {
+        "narrative": "Customizable Home Gaming Console",
+        "day": "2026-06-05",
+        "count": 9,
+        "volume": 18,
+        "momentum": 4.5,
+        "z_score": 1.57
+    },
+    {
+        "narrative": "Tekken Series Faces Backlash and Revamp.",
+        "day": "2026-06-06",
+        "count": 14,
+        "volume": 15,
+        "momentum": 14.0,
+        "z_score": 1.0
+    },
+    {
+        "narrative": "Air Travel Luggage Liquid Restrictions",
+        "day": "2026-06-06",
+        "count": 15,
+        "volume": 16,
+        "momentum": 15.0,
+        "z_score": 1.0
+    },
+    {
+        "narrative": "Finding the Right Dermatologist Care",
+        "day": "2026-06-05",
+        "count": 10,
+        "volume": 14,
+        "momentum": 3.33,
+        "z_score": 1.38
+    }
+]

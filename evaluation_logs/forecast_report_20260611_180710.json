@@ -1,0 +1,205 @@
+[
+    {
+        "narrative": "Kim's Asia Tour Celebrates New Beginnings",
+        "score": 7.4,
+        "slope": 5.0,
+        "momentum": 11.0,
+        "current_volume": 11
+    },
+    {
+        "narrative": "Trump's Embarrassing Presidential Blunder",
+        "score": 6.7,
+        "slope": 4.5,
+        "momentum": 10.0,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Middle East Conflict Hits Global Markets.",
+        "score": 4.92,
+        "slope": 7.3,
+        "momentum": 1.35,
+        "current_volume": 27
+    },
+    {
+        "narrative": "Expert Hair Restoration in Delhi Clinic",
+        "score": 4.03,
+        "slope": 4.5,
+        "momentum": 3.33,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in UAE.",
+        "score": 3.5,
+        "slope": 2.5,
+        "momentum": 5.0,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Empowering Women Through Music Festivals",
+        "score": 3.2,
+        "slope": 4.0,
+        "momentum": 2.0,
+        "current_volume": 20
+    },
+    {
+        "narrative": "Personalized Virtual Gaming Experience",
+        "score": 2.52,
+        "slope": 1.2,
+        "momentum": 4.5,
+        "current_volume": 9
+    },
+    {
+        "narrative": "Real Estate Trust and Controversy",
+        "score": 2.2,
+        "slope": 3.0,
+        "momentum": 1.0,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Facebook cookies enable website access.",
+        "score": 1.8,
+        "slope": 2.0,
+        "momentum": 1.5,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Safari Browser Settings and Options",
+        "score": 1.8,
+        "slope": 2.0,
+        "momentum": 1.5,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Prosperity Amidst War and Discovery",
+        "score": 1.6,
+        "slope": -2.0,
+        "momentum": 7.0,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Rare Earth Stocks Investment Opportunity",
+        "score": 1.5,
+        "slope": 0.5,
+        "momentum": 3.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Managing County Waste Disposal Effectively",
+        "score": 1.0,
+        "slope": 1.0,
+        "momentum": 1.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Nvidia leads AI global technological advancement.",
+        "score": 0.91,
+        "slope": 1.3,
+        "momentum": 0.33,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Texas Celebrates Sustainable Illinois Farming.",
+        "score": 0.78,
+        "slope": 1.0,
+        "momentum": 0.44,
+        "current_volume": 4
+    },
+    {
+        "narrative": "Rising Star Conquers Cricket Challenges",
+        "score": 0.59,
+        "slope": 0.5,
+        "momentum": 0.73,
+        "current_volume": 8
+    },
+    {
+        "narrative": "Cloudflare Security Panel Access Issue",
+        "score": 0.57,
+        "slope": 0.7,
+        "momentum": 0.38,
+        "current_volume": 3
+    },
+    {
+        "narrative": "Rural America Faces Unexpected Retail Upheaval",
+        "score": 0.51,
+        "slope": 0.8,
+        "momentum": 0.06,
+        "current_volume": 1
+    },
+    {
+        "narrative": "Lagos' Insecurity Threatens Governance and Education.",
+        "score": 0.47,
+        "slope": -0.0,
+        "momentum": 1.17,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Island nations with diverse cultural heritage.",
+        "score": 0.38,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Small island nations and landlocked republics.",
+        "score": 0.38,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Global Unity Through Diverse Governance",
+        "score": 0.38,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Epic Battles of Unmatched Power",
+        "score": 0.2,
+        "slope": -0.5,
+        "momentum": 1.25,
+        "current_volume": 5
+    },
+    {
+        "narrative": "Global Brands Unite for Efficient Logistics.",
+        "score": -0.45,
+        "slope": -1.2,
+        "momentum": 0.67,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Youth Struggle with Modern Emotional Burden",
+        "score": -0.66,
+        "slope": -1.5,
+        "momentum": 0.6,
+        "current_volume": 3
+    },
+    {
+        "narrative": "NFL Teams Make Strategic Player Trades",
+        "score": -0.92,
+        "slope": -1.9,
+        "momentum": 0.56,
+        "current_volume": 29
+    },
+    {
+        "narrative": "Electrifying Sustainable Vehicle Adoption in the Philippines.",
+        "score": -0.97,
+        "slope": -1.9,
+        "momentum": 0.43,
+        "current_volume": 3
+    },
+    {
+        "narrative": "A woman's journey to rediscover her past.",
+        "score": -1.73,
+        "slope": -3.0,
+        "momentum": 0.17,
+        "current_volume": 1
+    },
+    {
+        "narrative": "Nottinghamshire Gangland Crime Mystery Unfolds",
+        "score": -4.21,
+        "slope": -7.1,
+        "momentum": 0.13,
+        "current_volume": 2
+    }
+]
