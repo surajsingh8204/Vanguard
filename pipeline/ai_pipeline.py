@@ -23,6 +23,7 @@ from analytics.influence_engine import InfluenceEngine
 from analytics.graphs.influence_mapper import InfluenceMapper
 from analytics.narrative.emerging_narrative_detector import EmergingNarrativeDetector
 from analytics.narrative.forecast_engine import ForecastEngine
+from analytics.narrative.early_warning_engine import EarlyWarningEngine
 
 
 class AIPipeline:
@@ -828,6 +829,25 @@ class AIPipeline:
         logger.save(
             "forecast_report",
             forecasts
+        )
+
+        # ---------------------------------------------------
+        # EARLY WARNING SYSTEM
+        # ---------------------------------------------------
+
+        warning_engine = EarlyWarningEngine()
+
+        warnings = warning_engine.generate(
+            forecasts
+        )
+
+        warning_engine.display(
+            warnings
+        )
+
+        logger.save(
+            "early_warning_report",
+            warnings
         )
         
         # ---------------------------------------------------

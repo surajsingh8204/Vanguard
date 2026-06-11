@@ -1,0 +1,213 @@
+[
+    {
+        "narrative": "Kim's Joyful Asia Music Tour",
+        "warning_score": 2.48,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 11
+    },
+    {
+        "narrative": "Trump's Embarrassing Presidential Blunder",
+        "warning_score": 2.32,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 10
+    },
+    {
+        "narrative": "Expert Skin Restoration in Delhi",
+        "warning_score": 1.6,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 10
+    },
+    {
+        "narrative": "Sustainable Revolution in UAE Fashion.",
+        "warning_score": 1.49,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 10
+    },
+    {
+        "narrative": "Middle East Conflict Disrupts Global Markets",
+        "warning_score": 1.43,
+        "reasons": [
+            "High influence",
+            "Strong growth trend"
+        ],
+        "volume": 27
+    },
+    {
+        "narrative": "Southern Women Rock Coachella Stage",
+        "warning_score": 1.42,
+        "reasons": [
+            "High influence",
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 20
+    },
+    {
+        "narrative": "Remote PC Gaming Experience at Home",
+        "warning_score": 1.26,
+        "reasons": [
+            "Emerging narrative"
+        ],
+        "volume": 9
+    },
+    {
+        "narrative": "Rare Earth Stocks Investment Opportunity",
+        "warning_score": 0.84,
+        "reasons": [
+            "Emerging narrative"
+        ],
+        "volume": 6
+    },
+    {
+        "narrative": "War-torn Africa's fragile economic balance.",
+        "warning_score": 0.78,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 7
+    },
+    {
+        "narrative": "Real Estate Dispute Escalates Quickly",
+        "warning_score": 0.63,
+        "reasons": [
+            "Strong growth trend"
+        ],
+        "volume": 7
+    },
+    {
+        "narrative": "Facebook cookies enable app requests.",
+        "warning_score": 0.52,
+        "reasons": [],
+        "volume": 6
+    },
+    {
+        "narrative": "Safari Browser Settings and Preferences",
+        "warning_score": 0.52,
+        "reasons": [],
+        "volume": 6
+    },
+    {
+        "narrative": "Nvidia's AI Chip Dominance Accelerates",
+        "warning_score": 0.39,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 6
+    },
+    {
+        "narrative": "Managing County Waste Disposal Effectively",
+        "warning_score": 0.33,
+        "reasons": [],
+        "volume": 6
+    },
+    {
+        "narrative": "Sustainable Farming in Urban Communities",
+        "warning_score": 0.31,
+        "reasons": [],
+        "volume": 4
+    },
+    {
+        "narrative": "Small town America revives its heart.",
+        "warning_score": 0.29,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 1
+    },
+    {
+        "narrative": "Rising Star Conquers Cricket Challenges",
+        "warning_score": 0.25,
+        "reasons": [],
+        "volume": 8
+    },
+    {
+        "narrative": "Protecting Online Identity and Security",
+        "warning_score": 0.19,
+        "reasons": [],
+        "volume": 3
+    },
+    {
+        "narrative": "Nigeria's Struggle for Peace and Progress",
+        "warning_score": 0.18,
+        "reasons": [],
+        "volume": 7
+    },
+    {
+        "narrative": "Small Island Nations and Central Republics",
+        "warning_score": 0.18,
+        "reasons": [],
+        "volume": 2
+    },
+    {
+        "narrative": "Island Governance Across Diverse Continents",
+        "warning_score": 0.18,
+        "reasons": [],
+        "volume": 2
+    },
+    {
+        "narrative": "Island nations with diverse cultural ties.",
+        "warning_score": 0.17,
+        "reasons": [],
+        "volume": 2
+    },
+    {
+        "narrative": "Epic Power Unleashed",
+        "warning_score": 0.07,
+        "reasons": [],
+        "volume": 5
+    },
+    {
+        "narrative": "Global Leaders Unite for Sustainable Growth",
+        "warning_score": 0.03,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 2
+    },
+    {
+        "narrative": "Rival Teams Clash for Football Supremacy",
+        "warning_score": 0.02,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 29
+    },
+    {
+        "narrative": "\"Lost Generation's Silent Emotional Struggle\"",
+        "warning_score": -0.12,
+        "reasons": [],
+        "volume": 3
+    },
+    {
+        "narrative": "Electric vehicles gain traction in the Philippines.",
+        "warning_score": -0.16,
+        "reasons": [],
+        "volume": 3
+    },
+    {
+        "narrative": "Erika's Beloved Return to St. Paul",
+        "warning_score": -0.37,
+        "reasons": [],
+        "volume": 1
+    },
+    {
+        "narrative": "Nottinghamshire Family's Dark Rural Secret",
+        "warning_score": -0.97,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 2
+    }
+]
