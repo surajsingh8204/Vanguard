@@ -155,6 +155,104 @@ class ForecastEngine:
 
         return forecasts
 
+    def baseline_forecast(
+        self,
+        timeline
+    ):
+
+        forecasts = []
+
+        for narrative, days in timeline.items():
+
+            counts = list(days.values())
+
+            if len(counts) < 3:
+                continue
+
+            # -------------------------
+            # TREND SLOPE
+            # -------------------------
+
+            x = np.arange(
+                len(counts)
+            )
+
+            slope = np.polyfit(
+                x,
+                counts,
+                1
+            )[0]
+
+            # -------------------------
+            # RECENT MOMENTUM
+            # -------------------------
+
+            recent = counts[-1]
+
+            previous = counts[-2]
+
+            if previous == 0:
+
+                momentum = recent
+
+            else:
+
+                momentum = (
+                    recent / previous
+                )
+
+            # -------------------------
+            # BASELINE SCORE (no influence/emergence)
+            # -------------------------
+
+            score = (
+
+                0.6 * slope
+
+                +
+
+                0.4 * momentum
+
+            )
+
+            forecasts.append({
+
+                "narrative":
+                narrative,
+
+                "score":
+                round(
+                    float(score),
+                    2
+                ),
+
+                "slope":
+                round(
+                    float(slope),
+                    2
+                ),
+
+                "momentum":
+                round(
+                    float(momentum),
+                    2
+                ),
+
+                "current_volume":
+                recent
+            })
+
+        forecasts.sort(
+
+            key=lambda x:
+            x["score"],
+
+            reverse=True
+
+        )
+
+        return forecasts
+
     def display(
         self,
         forecasts

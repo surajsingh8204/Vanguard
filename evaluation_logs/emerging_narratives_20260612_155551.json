@@ -1,0 +1,79 @@
+[
+    {
+        "narrative": "Russian Revolution Unfolds in Turmoil",
+        "score": 2.4,
+        "momentum": 3.8066624897703196,
+        "z_score": 1.0,
+        "volume": 45
+    },
+    {
+        "narrative": "Kim's Asian Music Tour Takes Off",
+        "score": 1.95,
+        "momentum": 2.4849066497880004,
+        "z_score": 1.41,
+        "volume": 13
+    },
+    {
+        "narrative": "Trump's Embarrassing Presidential Blunder",
+        "score": 1.9,
+        "momentum": 2.3978952727983707,
+        "z_score": 1.41,
+        "volume": 12
+    },
+    {
+        "narrative": "Air Travel Baggage Liquid Restrictions",
+        "score": 1.89,
+        "momentum": 2.772588722239781,
+        "z_score": 1.0,
+        "volume": 16
+    },
+    {
+        "narrative": "Tekken series faces public backlash.",
+        "score": 1.85,
+        "momentum": 2.70805020110221,
+        "z_score": 1.0,
+        "volume": 15
+    },
+    {
+        "narrative": "Home Gaming Lab Setup",
+        "score": 1.64,
+        "momentum": 1.7047480922384253,
+        "z_score": 1.57,
+        "volume": 18
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in UAE Communities.",
+        "score": 1.55,
+        "momentum": 1.791759469228055,
+        "z_score": 1.31,
+        "volume": 17
+    },
+    {
+        "narrative": "Expert Hair Restoration in Delhi Clinic",
+        "score": 1.42,
+        "momentum": 1.4655675420143985,
+        "z_score": 1.38,
+        "volume": 14
+    },
+    {
+        "narrative": "Southern Women Shine in Vegas Music Scene",
+        "score": 1.24,
+        "momentum": 1.0986122886681098,
+        "z_score": 1.39,
+        "volume": 42
+    },
+    {
+        "narrative": "Rare Earth Stocks Investment Opportunity",
+        "score": 1.18,
+        "momentum": 1.3862943611198906,
+        "z_score": 0.98,
+        "volume": 13
+    },
+    {
+        "narrative": "Global Economic Turmoil and Instability Risks",
+        "score": 0.94,
+        "momentum": 2.0794415416798357,
+        "z_score": -0.2,
+        "volume": 47
+    }
+]

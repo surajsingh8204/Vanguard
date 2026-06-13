@@ -4,10 +4,12 @@ from collections import Counter
 from embeddings.embedding_services import EmbeddingService
 from vectorstore.faiss_store import VectorStore
 from intelligence.rag_engine import RAGEngine
+from intelligence.retrieval_reranker import RetrievalReranker
 
 from clustering.hdbscan_cluster import HDBSCANClusterer
 from clustering.subcluster import SubClusterer
 from analytics.cluster_labeler import ClusterLabeler
+from analytics.narrative.subcluster_labeler import SubclusterLabeler
 from processing.document_purifier import DocumentPurifier
 from analytics.narrative.timeline_engine import TimelineEngine
 from analytics.evaluation.evaluation_engine import EvaluationEngine
@@ -24,7 +26,9 @@ from analytics.graphs.influence_mapper import InfluenceMapper
 from analytics.narrative.emerging_narrative_detector import EmergingNarrativeDetector
 from analytics.narrative.forecast_engine import ForecastEngine
 from analytics.narrative.early_warning_engine import EarlyWarningEngine
-
+from analytics.evaluation.forecast_evaluator import ForecastEvaluator
+from analytics.evaluation.correlation_evaluator import CorrelationEvaluator
+from analytics.evaluation.label_audit import LabelAudit
 
 class AIPipeline:
 
@@ -197,9 +201,27 @@ class AIPipeline:
             # small clusters skip subclustering
             if len(cluster_embeddings) < 5:
 
+                small_cluster_texts = [
+
+                    x["text"]
+
+                    for x in items
+
+                ]
+
+                label = (
+
+                    labeler.generate_label(
+
+                        small_cluster_texts
+
+                    )
+
+                )
+
                 self.subcluster_labels[
                     int(main_cluster)
-                ][0] = cluster_label
+                ][0] = label
 
                 for item in items:
 
@@ -222,6 +244,46 @@ class AIPipeline:
                 cluster_embeddings
             )
 
+            # ---------------------------------------------
+            # HANDLE NOISE-ONLY SUBCLUSTERS
+            # ---------------------------------------------
+
+            valid_subclusters = [
+
+                x for x in sub_labels
+
+                if x != -1
+
+            ]
+
+            if len(valid_subclusters) == 0:
+
+                sub_labels = [
+
+                    0
+
+                    for _ in sub_labels
+
+                ]
+
+                print(
+                    f"Cluster {main_cluster} "
+                    f"had only noise subclusters."
+                )
+
+            print("\n" + "=" * 50)
+
+            print(
+                f"MAIN CLUSTER {main_cluster}"
+            )
+
+            print(
+                "UNIQUE SUBCLUSTER IDS:",
+                set(sub_labels)
+            )
+
+            print("=" * 50)
+
             from collections import defaultdict
 
             subcluster_groups = defaultdict(list)
@@ -231,31 +293,39 @@ class AIPipeline:
                 if sub_id == -1:
                     continue
 
-                subcluster_groups[sub_id].append(
+                subcluster_groups[
+                    sub_id
+                ].append(
+
                     items[idx]["text"]
+
                 )
 
             # ---------------------------------------------
-            # GENERATE SUBCLUSTER LABELS
+            # GENERATE LABELS
             # ---------------------------------------------
 
-            for sub_id, texts in subcluster_groups.items():
+            subcluster_labeler = SubclusterLabeler()
 
-                try:
+            for sub_id, texts in (
 
-                    sub_label = labeler.generate_label(
-                        texts[:20]
+                subcluster_groups.items()
+
+            ):
+
+                label = (
+
+                    subcluster_labeler.generate_label(
+                        texts
                     )
 
-                except Exception:
-
-                    sub_label = (
-                        f"Subcluster {sub_id}"
-                    )
+                )
 
                 self.subcluster_labels[
                     int(main_cluster)
-                ][int(sub_id)] = sub_label
+                ][
+                    int(sub_id)
+                ] = label
 
             for idx, item in enumerate(items):
 
@@ -410,7 +480,7 @@ class AIPipeline:
 
         initial_results = self.vector_store.search(
             query_embedding,
-            k=10
+            k=30
         )
 
         clusters = [r["cluster"] for r in initial_results]
@@ -460,7 +530,7 @@ class AIPipeline:
             cluster_results = self.vector_store.search_in_cluster(
                 query_embedding,
                 cluster_id,
-                k=4
+                k=15
             )
 
             all_results.extend(cluster_results)
@@ -469,13 +539,17 @@ class AIPipeline:
         # GLOBAL RERANK
         # ---------------------------------------------------
 
-        all_results = sorted(
-            all_results,
-            key=lambda x: x["score"],
-            reverse=True
-        )
+        reranker = RetrievalReranker()
 
-        results = all_results[:5]
+        results = reranker.rerank(
+
+            all_results,
+
+            max_per_subcluster=2,
+
+            top_k=8
+
+        )
         # ---------------------------------------------
         # RETRIEVAL CONFIDENCE CHECK
         # ---------------------------------------------
@@ -504,11 +578,23 @@ class AIPipeline:
             f"Score: {avg_score:.4f}"
         )
 
+        retrieval_stats = {
+
+            "question": question,
+
+            "max_score": max(scores),
+
+            "avg_score": avg_score,
+
+            "min_score": min(scores)
+        }
+
         if avg_score < 0.30:
 
             return (
                 "Insufficient narrative evidence found "
-                "in the current media corpus."
+                "in the current media corpus.",
+                retrieval_stats
             )
 
         print("\n📊 Retrieval Stats")
@@ -524,17 +610,6 @@ class AIPipeline:
         print(
             f"Min Score: {min(scores):.4f}"
         )
-
-        retrieval_stats = {
-
-            "question": question,
-
-            "max_score": max(scores),
-
-            "avg_score": avg_score,
-
-            "min_score": min(scores)
-        }
 
         # ---------------------------------------------------
         # DISPLAY
@@ -730,6 +805,35 @@ class AIPipeline:
         )
 
         # ---------------------------------------------------
+        # LABEL AUDIT
+        # ---------------------------------------------------
+
+        audit_engine = LabelAudit()
+
+        audit_report = (
+
+            audit_engine.analyze(
+
+                self.clustered_chunks,
+
+                self.cluster_labels,
+
+                self.subcluster_labels
+
+            )
+
+        )
+
+        audit_engine.display(
+            audit_report
+        )
+
+        logger.save(
+            "label_audit",
+            audit_report
+        )
+
+        # ---------------------------------------------------
         # NARRATIVE GRAPH
         # ---------------------------------------------------
 
@@ -829,6 +933,88 @@ class AIPipeline:
         logger.save(
             "forecast_report",
             forecasts
+        )
+
+        # ---------------------------------------------------
+        # FORECAST EVALUATION
+        # ---------------------------------------------------
+
+        baseline_forecasts = (
+
+            forecast_engine.baseline_forecast(
+
+                timeline_engine.timeline
+
+            )
+
+        )
+
+        evaluator = ForecastEvaluator()
+
+        evaluation_results = (
+
+            evaluator.evaluate(
+
+                timeline_engine.timeline,
+
+                baseline_forecasts,
+
+                forecasts
+
+            )
+
+        )
+
+        evaluator.display(
+
+            evaluation_results
+
+        )
+
+        logger.save(
+
+            "forecast_evaluation",
+
+            evaluation_results
+
+        )
+
+        # ---------------------------------------------------
+        # CORRELATION EVALUATION
+        # ---------------------------------------------------
+
+        corr_evaluator = (
+
+            CorrelationEvaluator()
+
+        )
+
+        corr_results = (
+
+            corr_evaluator.evaluate(
+
+                timeline_engine.timeline,
+
+                baseline_forecasts,
+
+                forecasts
+
+            )
+
+        )
+
+        corr_evaluator.display(
+
+            corr_results
+
+        )
+
+        logger.save(
+
+            "correlation_evaluation",
+
+            corr_results
+
         )
 
         # ---------------------------------------------------
