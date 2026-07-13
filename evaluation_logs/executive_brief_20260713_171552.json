@@ -1,0 +1,32 @@
+{
+    "priority_narratives": [
+        "Cluster 9",
+        "Cluster 30",
+        "Cluster 38",
+        "Cluster 17",
+        "Cluster 29"
+    ],
+    "emerging_risks": [
+        {
+            "narrative": "Cluster 9",
+            "warning_score": 2.44
+        },
+        {
+            "narrative": "Cluster 30",
+            "warning_score": 2.26
+        },
+        {
+            "narrative": "Cluster 17",
+            "warning_score": 1.55
+        },
+        {
+            "narrative": "Cluster 29",
+            "warning_score": 1.41
+        },
+        {
+            "narrative": "Cluster 38",
+            "warning_score": 1.37
+        }
+    ],
+    "strategic_observations": []
+}

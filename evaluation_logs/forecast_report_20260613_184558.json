@@ -1,0 +1,263 @@
+[
+    {
+        "narrative": "Kim's Joyful Asian Music Debut Tour",
+        "score": 4.62,
+        "slope": 5.0,
+        "momentum": 11.0,
+        "influence": 0.14,
+        "emergence": 1.95,
+        "current_volume": 11
+    },
+    {
+        "narrative": "Trump's Presidential Blunder",
+        "score": 4.22,
+        "slope": 4.5,
+        "momentum": 10.0,
+        "influence": 0.21,
+        "emergence": 1.9,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Global Markets Tumble Amid Conflict.",
+        "score": 3.27,
+        "slope": 7.3,
+        "momentum": 1.35,
+        "influence": 0.42,
+        "emergence": 0.0,
+        "current_volume": 27
+    },
+    {
+        "narrative": "Expert Hair Skin Restoration in Delhi Clinic.",
+        "score": 2.79,
+        "slope": 4.5,
+        "momentum": 3.33,
+        "influence": 0.21,
+        "emergence": 1.42,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in the UAE.",
+        "score": 2.36,
+        "slope": 2.5,
+        "momentum": 5.0,
+        "influence": 0.26,
+        "emergence": 1.55,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Southern Women Revive Roots Music",
+        "score": 2.33,
+        "slope": 4.0,
+        "momentum": 2.0,
+        "influence": 0.39,
+        "emergence": 1.24,
+        "current_volume": 20
+    },
+    {
+        "narrative": "Personalized Virtual Gaming Experience",
+        "score": 1.75,
+        "slope": 1.2,
+        "momentum": 4.5,
+        "influence": 0.22,
+        "emergence": 1.64,
+        "current_volume": 9
+    },
+    {
+        "narrative": "Homeowner Escalates Zillow Real Estate Dispute",
+        "score": 1.44,
+        "slope": 3.0,
+        "momentum": 1.0,
+        "influence": 0.18,
+        "emergence": 0.0,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Facebook Consent Cookie Issue",
+        "score": 1.14,
+        "slope": 2.0,
+        "momentum": 1.5,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Customizing Safari Browser Settings",
+        "score": 1.14,
+        "slope": 2.0,
+        "momentum": 1.5,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Rare Earth Investment Opportunities",
+        "score": 1.07,
+        "slope": 0.5,
+        "momentum": 3.0,
+        "influence": 0.18,
+        "emergence": 1.18,
+        "current_volume": 6
+    },
+    {
+        "narrative": "East Africa's Gold Rush Amid War Risks",
+        "score": 0.88,
+        "slope": -2.0,
+        "momentum": 7.0,
+        "influence": 0.48,
+        "emergence": 0.94,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Nvidia Dominates AI Chip Revolution.",
+        "score": 0.67,
+        "slope": 1.3,
+        "momentum": 0.33,
+        "influence": 0.42,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Future Waste Management Strategies",
+        "score": 0.65,
+        "slope": 1.0,
+        "momentum": 1.0,
+        "influence": 0.24,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Urban Texas Farmers Redefine Healthy Eating",
+        "score": 0.55,
+        "slope": 1.0,
+        "momentum": 0.44,
+        "influence": 0.3,
+        "emergence": 0.0,
+        "current_volume": 4
+    },
+    {
+        "narrative": "Small town revival through diner chaos.",
+        "score": 0.42,
+        "slope": 0.8,
+        "momentum": 0.06,
+        "influence": 0.42,
+        "emergence": 0.0,
+        "current_volume": 1
+    },
+    {
+        "narrative": "African Cricket Star Rises in Kolkata",
+        "score": 0.4,
+        "slope": 0.5,
+        "momentum": 0.73,
+        "influence": 0.3,
+        "emergence": 0.0,
+        "current_volume": 8
+    },
+    {
+        "narrative": "Social Media Security Threat Detection",
+        "score": 0.38,
+        "slope": 0.7,
+        "momentum": 0.38,
+        "influence": 0.12,
+        "emergence": 0.0,
+        "current_volume": 3
+    },
+    {
+        "narrative": "Nigeria's Rise to Prosperity and Peace",
+        "score": 0.28,
+        "slope": -0.0,
+        "momentum": 1.17,
+        "influence": 0.22,
+        "emergence": 0.0,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Island of United Diverse Nations",
+        "score": 0.28,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Island Nation of Small Republics",
+        "score": 0.28,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "influence": 0.21,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Island Nations Governance Systems",
+        "score": 0.28,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "influence": 0.21,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Epic Heroes Unleash Hidden Potential",
+        "score": 0.08,
+        "slope": -0.5,
+        "momentum": 1.25,
+        "influence": 0.13,
+        "emergence": 0.0,
+        "current_volume": 5
+    },
+    {
+        "narrative": "Global Brands Unite for Content Optimization.",
+        "score": -0.26,
+        "slope": -1.2,
+        "momentum": 0.67,
+        "influence": 0.45,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Young men face life's emotional struggles.",
+        "score": -0.44,
+        "slope": -1.5,
+        "momentum": 0.6,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 3
+    },
+    {
+        "narrative": "Rival Teams Clash in High-Stakes Football.",
+        "score": -0.5,
+        "slope": -1.9,
+        "momentum": 0.56,
+        "influence": 0.72,
+        "emergence": 0.0,
+        "current_volume": 29
+    },
+    {
+        "narrative": "Electric Rav4 Hybrid Leads Sustainable Shift.",
+        "score": -0.62,
+        "slope": -1.9,
+        "momentum": 0.43,
+        "influence": 0.28,
+        "emergence": 0.0,
+        "current_volume": 3
+    },
+    {
+        "narrative": "Johnson's Phoenix Rise from Past Memories",
+        "score": -1.12,
+        "slope": -3.0,
+        "momentum": 0.17,
+        "influence": 0.26,
+        "emergence": 0.0,
+        "current_volume": 1
+    },
+    {
+        "narrative": "Rural Maine Gangland Murder Mystery",
+        "score": -2.73,
+        "slope": -7.1,
+        "momentum": 0.13,
+        "influence": 0.4,
+        "emergence": 0.0,
+        "current_volume": 2
+    }
+]

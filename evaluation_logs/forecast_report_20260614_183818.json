@@ -1,0 +1,263 @@
+[
+    {
+        "narrative": "Kim's Joyful Asian Music Tour Begins",
+        "score": 4.62,
+        "slope": 5.0,
+        "momentum": 11.0,
+        "influence": 0.14,
+        "emergence": 1.95,
+        "current_volume": 11
+    },
+    {
+        "narrative": "Trump's Presidential Blunder",
+        "score": 4.22,
+        "slope": 4.5,
+        "momentum": 10.0,
+        "influence": 0.21,
+        "emergence": 1.9,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Middle East Conflict Sparks Global Turmoil",
+        "score": 3.27,
+        "slope": 7.3,
+        "momentum": 1.35,
+        "influence": 0.42,
+        "emergence": 0.0,
+        "current_volume": 27
+    },
+    {
+        "narrative": "Expert Skin Restoration in Delhi Clinic.",
+        "score": 2.79,
+        "slope": 4.5,
+        "momentum": 3.33,
+        "influence": 0.21,
+        "emergence": 1.42,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in UAE",
+        "score": 2.36,
+        "slope": 2.5,
+        "momentum": 5.0,
+        "influence": 0.26,
+        "emergence": 1.55,
+        "current_volume": 10
+    },
+    {
+        "narrative": "Empowered Women in Southern Roots Music",
+        "score": 2.33,
+        "slope": 4.0,
+        "momentum": 2.0,
+        "influence": 0.39,
+        "emergence": 1.24,
+        "current_volume": 20
+    },
+    {
+        "narrative": "Customizable Remote Gaming Experience",
+        "score": 1.75,
+        "slope": 1.2,
+        "momentum": 4.5,
+        "influence": 0.22,
+        "emergence": 1.64,
+        "current_volume": 9
+    },
+    {
+        "narrative": "Real Estate Market Trust Issues",
+        "score": 1.44,
+        "slope": 3.0,
+        "momentum": 1.0,
+        "influence": 0.18,
+        "emergence": 0.0,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Facebook enables website cookie access.",
+        "score": 1.14,
+        "slope": 2.0,
+        "momentum": 1.5,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Customizing Safari Browser Settings",
+        "score": 1.14,
+        "slope": 2.0,
+        "momentum": 1.5,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Rare Earth Investment Opportunities",
+        "score": 1.07,
+        "slope": 0.5,
+        "momentum": 3.0,
+        "influence": 0.18,
+        "emergence": 1.18,
+        "current_volume": 6
+    },
+    {
+        "narrative": "East Africa's Economic Gold Rush",
+        "score": 0.88,
+        "slope": -2.0,
+        "momentum": 7.0,
+        "influence": 0.48,
+        "emergence": 0.94,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Nvidia powers AI's global expansion.",
+        "score": 0.67,
+        "slope": 1.3,
+        "momentum": 0.33,
+        "influence": 0.42,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Irvine Waste Management System",
+        "score": 0.65,
+        "slope": 1.0,
+        "momentum": 1.0,
+        "influence": 0.24,
+        "emergence": 0.0,
+        "current_volume": 6
+    },
+    {
+        "narrative": "Texas Farmers Celebrate Wellness in Dallas.",
+        "score": 0.55,
+        "slope": 1.0,
+        "momentum": 0.44,
+        "influence": 0.3,
+        "emergence": 0.0,
+        "current_volume": 4
+    },
+    {
+        "narrative": "Small Town Revival Amidst Chaos",
+        "score": 0.42,
+        "slope": 0.8,
+        "momentum": 0.06,
+        "influence": 0.42,
+        "emergence": 0.0,
+        "current_volume": 1
+    },
+    {
+        "narrative": "Kolkata's Cricketer Rises to Fame",
+        "score": 0.4,
+        "slope": 0.5,
+        "momentum": 0.73,
+        "influence": 0.3,
+        "emergence": 0.0,
+        "current_volume": 8
+    },
+    {
+        "narrative": "Enhanced Online Security Measures Activated",
+        "score": 0.38,
+        "slope": 0.7,
+        "momentum": 0.38,
+        "influence": 0.12,
+        "emergence": 0.0,
+        "current_volume": 3
+    },
+    {
+        "narrative": "Lagos' Education Crisis Under Hamzat's Rule",
+        "score": 0.28,
+        "slope": -0.0,
+        "momentum": 1.17,
+        "influence": 0.22,
+        "emergence": 0.0,
+        "current_volume": 7
+    },
+    {
+        "narrative": "Island of Diverse Cultural Heritage",
+        "score": 0.28,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Island Nation of Small Republics",
+        "score": 0.28,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "influence": 0.21,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Island Governance in a Global Context",
+        "score": 0.28,
+        "slope": 0.5,
+        "momentum": 0.2,
+        "influence": 0.21,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Unmatched Power Awakens Within Heroes",
+        "score": 0.08,
+        "slope": -0.5,
+        "momentum": 1.25,
+        "influence": 0.13,
+        "emergence": 0.0,
+        "current_volume": 5
+    },
+    {
+        "narrative": "Global Brands Connect the World",
+        "score": -0.26,
+        "slope": -1.2,
+        "momentum": 0.67,
+        "influence": 0.45,
+        "emergence": 0.0,
+        "current_volume": 2
+    },
+    {
+        "narrative": "Young men face modern emotional struggles.",
+        "score": -0.44,
+        "slope": -1.5,
+        "momentum": 0.6,
+        "influence": 0.2,
+        "emergence": 0.0,
+        "current_volume": 3
+    },
+    {
+        "narrative": "Football Unites Diverse Communities Globally",
+        "score": -0.5,
+        "slope": -1.9,
+        "momentum": 0.56,
+        "influence": 0.72,
+        "emergence": 0.0,
+        "current_volume": 29
+    },
+    {
+        "narrative": "Hybrid SUV leads Philippine market growth.",
+        "score": -0.62,
+        "slope": -1.9,
+        "momentum": 0.43,
+        "influence": 0.28,
+        "emergence": 0.0,
+        "current_volume": 3
+    },
+    {
+        "narrative": "Erika's Rise to Beloved St. Paul Fame",
+        "score": -1.12,
+        "slope": -3.0,
+        "momentum": 0.17,
+        "influence": 0.26,
+        "emergence": 0.0,
+        "current_volume": 1
+    },
+    {
+        "narrative": "Notorious gangland crime wave unfolds.",
+        "score": -2.73,
+        "slope": -7.1,
+        "momentum": 0.13,
+        "influence": 0.4,
+        "emergence": 0.0,
+        "current_volume": 2
+    }
+]

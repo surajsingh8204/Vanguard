@@ -1,0 +1,79 @@
+[
+    {
+        "narrative": "Kim's Joyful Asian Music Tour",
+        "forecast_score": 4.62,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Rustic British Countryside Roadside Signs",
+            "Southern Roots Women's Music Empowerment Festival."
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Trump's Embarrassing Presidential Moment",
+        "forecast_score": 4.22,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Rustic British Countryside Roadside Signs",
+            "Small-town America Revives Amidst Chaos.",
+            "Erika's Rise to Beloved St. Paul Status"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Global Markets Tumble Amid Conflict",
+        "forecast_score": 3.27,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "New York City Faces Global Warning.",
+            "Rare Earth Investment Opportunity",
+            "Conflict Fuels Economic Uncertainty"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Delhi Expert Restores Damaged Skin",
+        "forecast_score": 2.79,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Empowering Teenagers for Better Brain Health"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in UAE Circles",
+        "forecast_score": 2.36,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Irvine Waste Management System",
+            "\"Global Enterprise Connections Through Smart Logistics\"",
+            "Urban Texas Celebrates Healthy Eating"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    }
+]

@@ -1,0 +1,79 @@
+[
+    {
+        "narrative": "Kim's Joyful Asian Music Tour Begins",
+        "forecast_score": 4.62,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Quirky British Village Life",
+            "Empowered Women in Southern Roots Music"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Trump's Presidential Blunder",
+        "forecast_score": 4.22,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Quirky British Village Life",
+            "Small Town Revival Amidst Chaos",
+            "Erika's Rise to Beloved St. Paul Fame"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Middle East Conflict Sparks Global Turmoil",
+        "forecast_score": 3.27,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "New York City Faces Economic Strain",
+            "Rare Earth Investment Opportunities",
+            "East Africa's Economic Gold Rush"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Expert Skin Restoration in Delhi Clinic.",
+        "forecast_score": 2.79,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Teen's Journey to Healthy Brain Balance"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in UAE",
+        "forecast_score": 2.36,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Irvine Waste Management System",
+            "Global Brands Connect the World",
+            "Texas Farmers Celebrate Wellness in Dallas."
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    }
+]

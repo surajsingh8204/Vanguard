@@ -21,6 +21,9 @@ class InfluenceMapper:
 
         for cluster_id, info in ranked:
 
+            if not graph.has_node(cluster_id):
+                continue
+
             neighbors = []
 
             for neighbor in graph.neighbors(

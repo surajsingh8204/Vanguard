@@ -1,0 +1,38 @@
+{
+    "priority_narratives": [
+        "Asian Pop Star's Global Triumph Tour",
+        "Trump's Presidential Blunder",
+        "Middle East Economic Turmoil Unfolds",
+        "Delhi Skin Restoration Expert Guidance",
+        "Sustainable Fashion Revolution in UAE Community"
+    ],
+    "emerging_risks": [
+        {
+            "narrative": "Asian Pop Star's Global Triumph Tour",
+            "warning_score": 2.48
+        },
+        {
+            "narrative": "Trump's Presidential Blunder",
+            "warning_score": 2.32
+        },
+        {
+            "narrative": "Delhi Skin Restoration Expert Guidance",
+            "warning_score": 1.6
+        },
+        {
+            "narrative": "Sustainable Fashion Revolution in UAE Community",
+            "warning_score": 1.49
+        },
+        {
+            "narrative": "Middle East Economic Turmoil Unfolds",
+            "warning_score": 1.43
+        }
+    ],
+    "strategic_observations": [
+        "Rival Chiefs Draft a Star Player may influence 2 related narratives.",
+        "Ukraine's Economic Struggle Amid Global Turmoil may influence 5 related narratives.",
+        "Global Brands Unite for Content Optimization. may influence 5 related narratives.",
+        "Small town diner in chaos. may influence 5 related narratives.",
+        "Middle East Economic Turmoil Unfolds may influence 4 related narratives."
+    ]
+}

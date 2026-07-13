@@ -1,0 +1,322 @@
+{
+    "2": {
+        "label": "Cluster 2",
+        "score": 0.0979,
+        "volume": 23,
+        "volume_score": 0.1631,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "34": {
+        "label": "Cluster 34",
+        "score": 0.2,
+        "volume": 47,
+        "volume_score": 0.3333,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "9": {
+        "label": "Cluster 9",
+        "score": 0.0553,
+        "volume": 13,
+        "volume_score": 0.0922,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "31": {
+        "label": "Cluster 31",
+        "score": 0.6,
+        "volume": 141,
+        "volume_score": 1.0,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "13": {
+        "label": "Cluster 13",
+        "score": 0.0596,
+        "volume": 14,
+        "volume_score": 0.0993,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "37": {
+        "label": "Cluster 37",
+        "score": 0.1404,
+        "volume": 33,
+        "volume_score": 0.234,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "38": {
+        "label": "Cluster 38",
+        "score": 0.2426,
+        "volume": 57,
+        "volume_score": 0.4043,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "3": {
+        "label": "Cluster 3",
+        "score": 0.1787,
+        "volume": 42,
+        "volume_score": 0.2979,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "25": {
+        "label": "Cluster 25",
+        "score": 0.2085,
+        "volume": 49,
+        "volume_score": 0.3475,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "15": {
+        "label": "Cluster 15",
+        "score": 0.0766,
+        "volume": 18,
+        "volume_score": 0.1277,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "16": {
+        "label": "Cluster 16",
+        "score": 0.1064,
+        "volume": 25,
+        "volume_score": 0.1773,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "36": {
+        "label": "Cluster 36",
+        "score": 0.1106,
+        "volume": 26,
+        "volume_score": 0.1844,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "28": {
+        "label": "Cluster 28",
+        "score": 0.1021,
+        "volume": 24,
+        "volume_score": 0.1702,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "12": {
+        "label": "Cluster 12",
+        "score": 0.0936,
+        "volume": 22,
+        "volume_score": 0.156,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "14": {
+        "label": "Cluster 14",
+        "score": 0.0936,
+        "volume": 22,
+        "volume_score": 0.156,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "19": {
+        "label": "Cluster 19",
+        "score": 0.1915,
+        "volume": 45,
+        "volume_score": 0.3191,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "35": {
+        "label": "Cluster 35",
+        "score": 0.0553,
+        "volume": 13,
+        "volume_score": 0.0922,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "29": {
+        "label": "Cluster 29",
+        "score": 0.0723,
+        "volume": 17,
+        "volume_score": 0.1206,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "26": {
+        "label": "Cluster 26",
+        "score": 0.0681,
+        "volume": 16,
+        "volume_score": 0.1135,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "30": {
+        "label": "Cluster 30",
+        "score": 0.0511,
+        "volume": 12,
+        "volume_score": 0.0851,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "33": {
+        "label": "Cluster 33",
+        "score": 0.0681,
+        "volume": 16,
+        "volume_score": 0.1135,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "27": {
+        "label": "Cluster 27",
+        "score": 0.0766,
+        "volume": 18,
+        "volume_score": 0.1277,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "24": {
+        "label": "Cluster 24",
+        "score": 0.0638,
+        "volume": 15,
+        "volume_score": 0.1064,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "11": {
+        "label": "Cluster 11",
+        "score": 0.0638,
+        "volume": 15,
+        "volume_score": 0.1064,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "23": {
+        "label": "Cluster 23",
+        "score": 0.0723,
+        "volume": 17,
+        "volume_score": 0.1206,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "21": {
+        "label": "Cluster 21",
+        "score": 0.0638,
+        "volume": 15,
+        "volume_score": 0.1064,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "5": {
+        "label": "Cluster 5",
+        "score": 0.0681,
+        "volume": 16,
+        "volume_score": 0.1135,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "4": {
+        "label": "Cluster 4",
+        "score": 0.0553,
+        "volume": 13,
+        "volume_score": 0.0922,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "17": {
+        "label": "Cluster 17",
+        "score": 0.0596,
+        "volume": 14,
+        "volume_score": 0.0993,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "18": {
+        "label": "Cluster 18",
+        "score": 0.0511,
+        "volume": 12,
+        "volume_score": 0.0851,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "39": {
+        "label": "Cluster 39",
+        "score": 0.0723,
+        "volume": 17,
+        "volume_score": 0.1206,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "0": {
+        "label": "Cluster 0",
+        "score": 0.0511,
+        "volume": 12,
+        "volume_score": 0.0851,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "1": {
+        "label": "Cluster 1",
+        "score": 0.0511,
+        "volume": 12,
+        "volume_score": 0.0851,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "6": {
+        "label": "Cluster 6",
+        "score": 0.0553,
+        "volume": 13,
+        "volume_score": 0.0922,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "8": {
+        "label": "Cluster 8",
+        "score": 0.0553,
+        "volume": 13,
+        "volume_score": 0.0922,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "7": {
+        "label": "Cluster 7",
+        "score": 0.0553,
+        "volume": 13,
+        "volume_score": 0.0922,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "10": {
+        "label": "Cluster 10",
+        "score": 0.0553,
+        "volume": 13,
+        "volume_score": 0.0922,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "20": {
+        "label": "Cluster 20",
+        "score": 0.0596,
+        "volume": 14,
+        "volume_score": 0.0993,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "22": {
+        "label": "Cluster 22",
+        "score": 0.0511,
+        "volume": 12,
+        "volume_score": 0.0851,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    },
+    "32": {
+        "label": "Cluster 32",
+        "score": 0.0681,
+        "volume": 16,
+        "volume_score": 0.1135,
+        "pagerank_score": 0,
+        "betweenness_score": 0
+    }
+}

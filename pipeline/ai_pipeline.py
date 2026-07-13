@@ -1,3 +1,4 @@
+import hashlib
 import json
 from collections import Counter
 
@@ -29,6 +30,20 @@ from analytics.narrative.early_warning_engine import EarlyWarningEngine
 from analytics.evaluation.forecast_evaluator import ForecastEvaluator
 from analytics.evaluation.correlation_evaluator import CorrelationEvaluator
 from analytics.evaluation.label_audit import LabelAudit
+from outputs.reports.intelligence_brief import (
+    IntelligenceBriefGenerator
+)
+from outputs.reports.impact_analysis import (
+    ImpactAnalyzer
+)
+from outputs.reports.executive_brief import (
+    ExecutiveBriefGenerator
+)
+from intelligence.strategic_context_builder import (
+    StrategicContextBuilder
+)
+
+from utils.artifact_manager import ArtifactManager
 
 class AIPipeline:
 
@@ -68,6 +83,87 @@ class AIPipeline:
     def build_vector_db(self, articles):
 
         print("Building vector database...")
+
+        artifact_manager = ArtifactManager()
+
+        dataset_path = "data_lake/processed/enriched_articles.json"
+
+        with open(dataset_path, "rb") as f:
+            current_hash = hashlib.md5(
+                f.read()
+            ).hexdigest()
+
+        build_info = artifact_manager.load_json(
+            "artifacts/build_info.json"
+        )
+
+        if (
+
+            build_info
+
+            and
+
+            build_info["dataset_hash"] == current_hash
+
+            and
+
+            artifact_manager.exists(
+                "artifacts/vectorstore/faiss.index"
+            )
+
+        ):
+
+            print("\n✅ Dataset unchanged.")
+            print("Loading existing artifacts...\n")
+
+            self.clustered_chunks = artifact_manager.load_json(
+                "artifacts/clustered_chunks.json"
+            )
+
+            self.cluster_labels = artifact_manager.load_json(
+                "artifacts/cluster_labels.json"
+            )
+
+            self.subcluster_labels = artifact_manager.load_json(
+                "artifacts/subcluster_labels.json"
+            )
+
+            self.cluster_groups = artifact_manager.load_json(
+                "artifacts/cluster_groups.json"
+            )
+
+            self.vector_store = VectorStore.load(
+                "artifacts/vectorstore"
+            )
+
+            if artifact_manager.analytics_exist():
+
+                print("✅ Analytics cache found.")
+
+                self.timeline = artifact_manager.load_json(
+                    "artifacts/analytics/timeline.json"
+                )
+
+                self.forecasts = artifact_manager.load_json(
+                    "artifacts/analytics/forecasts.json"
+                )
+
+                self.early_warnings = artifact_manager.load_json(
+                    "artifacts/analytics/early_warnings.json"
+                )
+
+                self.influence_scores = artifact_manager.load_json(
+                    "artifacts/analytics/influence_scores.json"
+                )
+
+                self.executive_brief = artifact_manager.load_json(
+                    "artifacts/analytics/executive_brief.json"
+                )
+
+                print("✅ Analytics loaded.")
+
+            print("✅ Vanguard loaded from artifacts.")
+            return
 
         all_chunks = []
         purifier = DocumentPurifier()
@@ -305,8 +401,6 @@ class AIPipeline:
             # GENERATE LABELS
             # ---------------------------------------------
 
-            subcluster_labeler = SubclusterLabeler()
-
             for sub_id, texts in (
 
                 subcluster_groups.items()
@@ -315,7 +409,7 @@ class AIPipeline:
 
                 label = (
 
-                    subcluster_labeler.generate_label(
+                    labeler.generate_label(
                         texts
                     )
 
@@ -458,7 +552,69 @@ class AIPipeline:
             clustered_chunks
         )
 
+        self.vector_store.save(
+            "artifacts/vectorstore"
+        )
+
         self.clustered_chunks = clustered_chunks
+
+        artifact_manager = ArtifactManager()
+
+        artifact_manager.save_json(
+
+            "artifacts/clustered_chunks.json",
+
+            clustered_chunks
+
+        )
+
+        artifact_manager.save_json(
+
+            "artifacts/cluster_labels.json",
+
+            self.cluster_labels
+
+        )
+
+        artifact_manager.save_json(
+
+            "artifacts/subcluster_labels.json",
+
+            self.subcluster_labels
+
+        )
+
+        artifact_manager.save_json(
+
+            "artifacts/cluster_groups.json",
+
+            self.cluster_groups
+
+        )
+
+        print(
+            "\n✅ Clustering artifacts saved."
+        )
+
+        dataset_path = "data_lake/processed/enriched_articles.json"
+
+        with open(dataset_path, "rb") as f:
+            dataset_hash = hashlib.md5(
+                f.read()
+            ).hexdigest()
+
+        build_info = {
+            "dataset_hash": dataset_hash,
+            "embedding_model": "all-MiniLM-L6-v2",
+            "num_chunks": len(clustered_chunks)
+        }
+
+        artifact_manager.save_json(
+            "artifacts/build_info.json",
+            build_info
+        )
+
+        print("✅ Build information saved.")
 
         print(
             "Vector DB built with",
@@ -665,18 +821,22 @@ class AIPipeline:
         # CONTEXT BUILDING
         # ---------------------------------------------------
 
-        context = "\n\n".join([
-            r["text"] 
+        retrieval_context = "\n\n".join(
+
+            r["text"]
+
             for r in results
-        ])
+
+        )
 
         # ---------------------------------------------------
         # GENERATE RESPONSE
         # ---------------------------------------------------
 
         answer = self.rag.generate(
-            context,
-            question
+            retrieval_context,
+            question,
+            self.strategic_context
         )
 
         return answer, retrieval_stats
@@ -687,6 +847,7 @@ class AIPipeline:
 
     def run(self):
         logger = EvaluationLogger()
+        artifact_manager = ArtifactManager()
 
         print("Loading processed data...")
 
@@ -804,6 +965,13 @@ class AIPipeline:
             timeline_engine.timeline
         )
 
+        artifact_manager.save_json(
+            "artifacts/analytics/timeline.json",
+            timeline_engine.timeline
+        )
+
+        print("✅ Timeline saved.")
+
         # ---------------------------------------------------
         # LABEL AUDIT
         # ---------------------------------------------------
@@ -898,6 +1066,13 @@ class AIPipeline:
             influence_scores
         )
 
+        artifact_manager.save_json(
+            "artifacts/analytics/influence_scores.json",
+            influence_scores
+        )
+
+        print("✅ Influence scores saved.")
+
 
         mapper = InfluenceMapper()
 
@@ -934,6 +1109,13 @@ class AIPipeline:
             "forecast_report",
             forecasts
         )
+
+        artifact_manager.save_json(
+            "artifacts/analytics/forecasts.json",
+            forecasts
+        )
+
+        print("✅ Forecasts saved.")
 
         # ---------------------------------------------------
         # FORECAST EVALUATION
@@ -980,6 +1162,156 @@ class AIPipeline:
         )
 
         # ---------------------------------------------------
+        # EARLY WARNING SYSTEM
+        # ---------------------------------------------------
+
+        warning_engine = EarlyWarningEngine()
+
+        warnings = warning_engine.generate(
+            forecasts
+        )
+
+        warning_engine.display(
+            warnings
+        )
+
+        artifact_manager.save_json(
+            "artifacts/analytics/early_warnings.json",
+            warnings
+        )
+
+        print("✅ Early warnings saved.")
+
+        logger.save(
+            "early_warning_report",
+            warnings
+        )
+
+        # ---------------------------------------------------
+        # INTELLIGENCE BRIEFING
+        # ---------------------------------------------------
+
+        brief_generator = (
+            IntelligenceBriefGenerator()
+        )
+
+        briefs = (
+
+            brief_generator.generate(
+
+                forecasts,
+
+                influence_scores,
+
+                warnings,
+
+                graph
+
+            )
+
+        )
+
+        brief_generator.display(
+            briefs
+        )
+
+        logger.save(
+            "intelligence_briefs",
+            briefs
+        )
+
+        # ---------------------------------------------------
+        # IMPACT ANALYSIS
+        # ---------------------------------------------------
+
+        impact_analyzer = ImpactAnalyzer()
+
+        impact_reports = (
+
+            impact_analyzer.generate(
+
+                influence_scores,
+
+                graph
+
+            )
+
+        )
+
+        impact_analyzer.display(
+            impact_reports
+        )
+
+        # ---------------------------------------------------
+        # EXECUTIVE BRIEF
+        # ---------------------------------------------------
+
+        executive_generator = (
+
+            ExecutiveBriefGenerator()
+
+        )
+
+        executive_brief = (
+
+            executive_generator.generate(
+
+                forecasts,
+
+                warnings,
+
+                influence_scores,
+
+                impact_reports
+
+            )
+
+        )
+
+        executive_generator.display(
+            executive_brief
+        )
+
+        logger.save(
+
+            "executive_brief",
+
+            executive_brief
+
+        )
+
+        artifact_manager.save_json(
+            "artifacts/analytics/executive_brief.json",
+            executive_brief
+        )
+
+        # ---------------------------------------------------
+        # STRATEGIC CONTEXT
+        # ---------------------------------------------------
+
+        strategic_builder = (
+
+            StrategicContextBuilder()
+
+        )
+
+        self.strategic_context = (
+
+            strategic_builder.build(
+
+                forecasts,
+
+                warnings,
+
+                influence_scores,
+
+                impact_reports
+
+            )
+
+        )
+
+        # ---------------------------------------------------
         # CORRELATION EVALUATION
         # ---------------------------------------------------
 
@@ -1017,25 +1349,6 @@ class AIPipeline:
 
         )
 
-        # ---------------------------------------------------
-        # EARLY WARNING SYSTEM
-        # ---------------------------------------------------
-
-        warning_engine = EarlyWarningEngine()
-
-        warnings = warning_engine.generate(
-            forecasts
-        )
-
-        warning_engine.display(
-            warnings
-        )
-
-        logger.save(
-            "early_warning_report",
-            warnings
-        )
-        
         # ---------------------------------------------------
         # GRAPH DIAGNOSTICS
         # ---------------------------------------------------

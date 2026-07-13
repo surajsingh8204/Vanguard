@@ -1,3 +1,6 @@
+import json
+import os
+
 import faiss
 import numpy as np
 
@@ -39,6 +42,148 @@ class VectorStore:
                 self.cluster_map[cluster] = []
 
             self.cluster_map[cluster].append(idx)
+
+    def save(
+
+        self,
+
+        directory
+
+    ):
+
+        os.makedirs(
+            directory,
+            exist_ok=True
+        )
+
+        # save faiss index
+
+        faiss.write_index(
+
+            self.index,
+
+            os.path.join(
+                directory,
+                "faiss.index"
+            )
+
+        )
+
+        # save metadata
+
+        metadata = {
+
+            "texts":
+                self.texts,
+
+            "cluster_map":
+                self.cluster_map,
+
+            "embeddings":
+                np.array(
+                    self.embeddings
+                ).tolist()
+        }
+
+        with open(
+
+            os.path.join(
+                directory,
+                "metadata.json"
+            ),
+
+            "w",
+
+            encoding="utf-8"
+
+        ) as f:
+
+            json.dump(
+
+                metadata,
+
+                f,
+
+                indent=4,
+
+                ensure_ascii=False
+
+            )
+
+        print(
+            "✅ Vector store saved."
+        )
+
+    @classmethod
+    def load(
+
+        cls,
+
+        directory
+
+    ):
+
+        index = faiss.read_index(
+
+            os.path.join(
+                directory,
+                "faiss.index"
+            )
+
+        )
+
+        with open(
+
+            os.path.join(
+                directory,
+                "metadata.json"
+            ),
+
+            "r",
+
+            encoding="utf-8"
+
+        ) as f:
+
+            metadata = json.load(f)
+
+        dimension = index.d
+
+        store = cls(
+            dimension
+        )
+
+        store.index = index
+
+        store.texts = metadata[
+            "texts"
+        ]
+
+        store.embeddings = np.array(
+
+            metadata[
+                "embeddings"
+            ],
+
+            dtype="float32"
+
+        )
+
+        store.cluster_map = {
+
+            int(k): v
+
+            for k, v in
+            metadata[
+                "cluster_map"
+            ].items()
+        }
+
+        print(
+            "✅ Vector store loaded."
+        )
+
+        return store
 
     def search(self, query_embedding, k=5):
 

@@ -1,0 +1,79 @@
+[
+    {
+        "narrative": "Asian Pop Star's Global Triumph Tour",
+        "forecast_score": 4.62,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Rustic British Countryside Road Signs",
+            "Southern Women Rock Las Vegas Music Festivals"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Trump's Presidential Blunder",
+        "forecast_score": 4.22,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Rustic British Countryside Road Signs",
+            "Small town diner in chaos.",
+            "Rise of a New Editor"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Middle East Economic Turmoil Unfolds",
+        "forecast_score": 3.27,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "New York City Faces Economic Collapse.",
+            "Rare Earth Investment Opportunity",
+            "Ukraine's Economic Struggle Amid Global Turmoil"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Delhi Skin Restoration Expert Guidance",
+        "forecast_score": 2.79,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Teenage Acne Treatment and Brain Health."
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in UAE Community",
+        "forecast_score": 2.36,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Irvine Waste Management Initiative",
+            "Global Brands Unite for Content Optimization.",
+            "Urban Farming Revolution in Texas."
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    }
+]

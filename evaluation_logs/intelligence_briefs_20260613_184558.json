@@ -1,0 +1,79 @@
+[
+    {
+        "narrative": "Kim's Joyful Asian Music Debut Tour",
+        "forecast_score": 4.62,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "British Quirky Comedy Showcase",
+            "Southern Women Revive Roots Music"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Trump's Presidential Blunder",
+        "forecast_score": 4.22,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "British Quirky Comedy Showcase",
+            "Small town revival through diner chaos.",
+            "Johnson's Phoenix Rise from Past Memories"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Global Markets Tumble Amid Conflict.",
+        "forecast_score": 3.27,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "City Struggles Amid Global Economic Crisis",
+            "Rare Earth Investment Opportunities",
+            "East Africa's Gold Rush Amid War Risks"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Expert Hair Skin Restoration in Delhi Clinic.",
+        "forecast_score": 2.79,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Youthful Skin for a Healthy Life"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in the UAE.",
+        "forecast_score": 2.36,
+        "signals": [
+            "High Influence",
+            "Early Warning",
+            "Strong Momentum"
+        ],
+        "related": [
+            "Future Waste Management Strategies",
+            "Global Brands Unite for Content Optimization.",
+            "Urban Texas Farmers Redefine Healthy Eating"
+        ],
+        "risk": "HIGH",
+        "outlook": "Rapid growth expected."
+    }
+]

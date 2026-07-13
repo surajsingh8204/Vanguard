@@ -1,0 +1,38 @@
+{
+    "priority_narratives": [
+        "Kim's Joyful Asian Music Debut Tour",
+        "Trump's Presidential Blunder",
+        "Global Markets Tumble Amid Conflict.",
+        "Expert Hair Skin Restoration in Delhi Clinic.",
+        "Sustainable Fashion Revolution in the UAE."
+    ],
+    "emerging_risks": [
+        {
+            "narrative": "Kim's Joyful Asian Music Debut Tour",
+            "warning_score": 2.48
+        },
+        {
+            "narrative": "Trump's Presidential Blunder",
+            "warning_score": 2.32
+        },
+        {
+            "narrative": "Expert Hair Skin Restoration in Delhi Clinic.",
+            "warning_score": 1.6
+        },
+        {
+            "narrative": "Sustainable Fashion Revolution in the UAE.",
+            "warning_score": 1.49
+        },
+        {
+            "narrative": "Global Markets Tumble Amid Conflict.",
+            "warning_score": 1.43
+        }
+    ],
+    "strategic_observations": [
+        "Rival Teams Clash in High-Stakes Football. may influence 2 related narratives.",
+        "East Africa's Gold Rush Amid War Risks may influence 5 related narratives.",
+        "Global Brands Unite for Content Optimization. may influence 5 related narratives.",
+        "Small town revival through diner chaos. may influence 5 related narratives.",
+        "Global Markets Tumble Amid Conflict. may influence 4 related narratives."
+    ]
+}

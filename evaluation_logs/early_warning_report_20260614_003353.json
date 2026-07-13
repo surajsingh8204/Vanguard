@@ -1,0 +1,213 @@
+[
+    {
+        "narrative": "Asian Pop Star's Global Triumph Tour",
+        "warning_score": 2.48,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 11
+    },
+    {
+        "narrative": "Trump's Presidential Blunder",
+        "warning_score": 2.32,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 10
+    },
+    {
+        "narrative": "Delhi Skin Restoration Expert Guidance",
+        "warning_score": 1.6,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 10
+    },
+    {
+        "narrative": "Sustainable Fashion Revolution in UAE Community",
+        "warning_score": 1.49,
+        "reasons": [
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 10
+    },
+    {
+        "narrative": "Middle East Economic Turmoil Unfolds",
+        "warning_score": 1.43,
+        "reasons": [
+            "High influence",
+            "Strong growth trend"
+        ],
+        "volume": 27
+    },
+    {
+        "narrative": "Southern Women Rock Las Vegas Music Festivals",
+        "warning_score": 1.42,
+        "reasons": [
+            "High influence",
+            "Emerging narrative",
+            "Strong growth trend"
+        ],
+        "volume": 20
+    },
+    {
+        "narrative": "Virtual Gaming PC Setup Platform",
+        "warning_score": 1.26,
+        "reasons": [
+            "Emerging narrative"
+        ],
+        "volume": 9
+    },
+    {
+        "narrative": "Rare Earth Investment Opportunity",
+        "warning_score": 0.84,
+        "reasons": [
+            "Emerging narrative"
+        ],
+        "volume": 6
+    },
+    {
+        "narrative": "Ukraine's Economic Struggle Amid Global Turmoil",
+        "warning_score": 0.78,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 7
+    },
+    {
+        "narrative": "Homebuyers' Trust in Real Estate Agents",
+        "warning_score": 0.63,
+        "reasons": [
+            "Strong growth trend"
+        ],
+        "volume": 7
+    },
+    {
+        "narrative": "Cookie settings in Facebook app.",
+        "warning_score": 0.52,
+        "reasons": [],
+        "volume": 6
+    },
+    {
+        "narrative": "Safari Browser Settings Reset",
+        "warning_score": 0.52,
+        "reasons": [],
+        "volume": 6
+    },
+    {
+        "narrative": "Accelerating AI Revolution Unfolds Rapidly",
+        "warning_score": 0.39,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 6
+    },
+    {
+        "narrative": "Irvine Waste Management Initiative",
+        "warning_score": 0.33,
+        "reasons": [],
+        "volume": 6
+    },
+    {
+        "narrative": "Urban Farming Revolution in Texas.",
+        "warning_score": 0.31,
+        "reasons": [],
+        "volume": 4
+    },
+    {
+        "narrative": "Small town diner in chaos.",
+        "warning_score": 0.29,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 1
+    },
+    {
+        "narrative": "Rising Star of Kolkata Cricket",
+        "warning_score": 0.25,
+        "reasons": [],
+        "volume": 8
+    },
+    {
+        "narrative": "Enhanced Website Security Measures",
+        "warning_score": 0.19,
+        "reasons": [],
+        "volume": 3
+    },
+    {
+        "narrative": "Nigeria's Education Upgrade Amidst Insecurity.",
+        "warning_score": 0.18,
+        "reasons": [],
+        "volume": 7
+    },
+    {
+        "narrative": "Island nation in a republic.",
+        "warning_score": 0.18,
+        "reasons": [],
+        "volume": 2
+    },
+    {
+        "narrative": "Global Island Governance Unites Diverse Systems",
+        "warning_score": 0.18,
+        "reasons": [],
+        "volume": 2
+    },
+    {
+        "narrative": "Island of Diverse Cultural Heritage",
+        "warning_score": 0.17,
+        "reasons": [],
+        "volume": 2
+    },
+    {
+        "narrative": "Eternal Balance of Unmatched Power",
+        "warning_score": 0.07,
+        "reasons": [],
+        "volume": 5
+    },
+    {
+        "narrative": "Global Brands Unite for Content Optimization.",
+        "warning_score": 0.03,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 2
+    },
+    {
+        "narrative": "Rival Chiefs Draft a Star Player",
+        "warning_score": 0.02,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 29
+    },
+    {
+        "narrative": "Young men face overwhelming modern stress.",
+        "warning_score": -0.12,
+        "reasons": [],
+        "volume": 3
+    },
+    {
+        "narrative": "Electric Vehicles Gain Philippine Market Share",
+        "warning_score": -0.16,
+        "reasons": [],
+        "volume": 3
+    },
+    {
+        "narrative": "Rise of a New Editor",
+        "warning_score": -0.37,
+        "reasons": [],
+        "volume": 1
+    },
+    {
+        "narrative": "Rural Maine Crime Unfolds in Darkness",
+        "warning_score": -0.97,
+        "reasons": [
+            "High influence"
+        ],
+        "volume": 2
+    }
+]

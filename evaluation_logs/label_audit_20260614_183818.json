@@ -1,0 +1,395 @@
+[
+    {
+        "cluster": 0,
+        "label": "Facebook enables website cookie access.",
+        "volume": 12,
+        "subclusters": [
+            "Facebook cookies enable website access."
+        ]
+    },
+    {
+        "cluster": 1,
+        "label": "Customizing Safari Browser Settings",
+        "volume": 12,
+        "subclusters": [
+            "Safari Browser Settings and Preferences"
+        ]
+    },
+    {
+        "cluster": 2,
+        "label": "Enhanced Online Security Measures Activated",
+        "volume": 23,
+        "subclusters": [
+            "Cloudflare Origin Security Reach Issue",
+            "Cloudflare blocks suspicious website access.",
+            "Interactive Social Media Sharing Panel"
+        ]
+    },
+    {
+        "cluster": 3,
+        "label": "Empowered Women in Southern Roots Music",
+        "volume": 42,
+        "subclusters": [
+            "Fierce Female Headlines Coachella Music Festival.",
+            "IHeartRadio Music Festival Finale",
+            "Southern Roots Music Tour Revival",
+            "Unknown",
+            "Women's voices in music empowerment."
+        ]
+    },
+    {
+        "cluster": 4,
+        "label": "Nature's Beauty in Human Form",
+        "volume": 13,
+        "subclusters": [
+            "\"Botanical beauty on human skin\""
+        ]
+    },
+    {
+        "cluster": 5,
+        "label": "Airport Liquid Luggage Travel Restrictions",
+        "volume": 16,
+        "subclusters": [
+            "Air Travel Luggage Liquid Restrictions"
+        ]
+    },
+    {
+        "cluster": 6,
+        "label": "Island of Diverse Cultural Heritage",
+        "volume": 13,
+        "subclusters": [
+            "Island nations with diverse cultural heritage."
+        ]
+    },
+    {
+        "cluster": 7,
+        "label": "Island Governance in a Global Context",
+        "volume": 13,
+        "subclusters": [
+            "Island nations in diverse global contexts.",
+            "Island nations with diverse governance systems."
+        ]
+    },
+    {
+        "cluster": 8,
+        "label": "Island Nation of Small Republics",
+        "volume": 13,
+        "subclusters": [
+            "Small Island Nations and Central Republics"
+        ]
+    },
+    {
+        "cluster": 9,
+        "label": "Kim's Joyful Asian Music Tour Begins",
+        "volume": 13,
+        "subclusters": [
+            "Kim's Joyful Asia Music Tour Begins"
+        ]
+    },
+    {
+        "cluster": 10,
+        "label": "Alaskan Telecom Scandal Unfolds",
+        "volume": 13,
+        "subclusters": [
+            "Alaskan Telecom Scandal Exposed"
+        ]
+    },
+    {
+        "cluster": 11,
+        "label": "Unmatched Power Awakens Within Heroes",
+        "volume": 15,
+        "subclusters": [
+            "Goku's Incredible Super Saiyan Power Rises",
+            "Naruto's Ultimate Sage Mode Power",
+            "Sukuna's Unmatched Power in Jujutsu Kaisen"
+        ]
+    },
+    {
+        "cluster": 12,
+        "label": "Small Town Revival Amidst Chaos",
+        "volume": 22,
+        "subclusters": [
+            "Classic American diner revival.",
+            "Retail Chaos and Unhappiness",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 13,
+        "label": "Erika's Rise to Beloved St. Paul Fame",
+        "volume": 14,
+        "subclusters": [
+            "Erika Kirk's Phoenix Rise",
+            "Remembering St. Paul's Beloved Editor",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 14,
+        "label": "Teen's Journey to Healthy Brain Balance",
+        "volume": 22,
+        "subclusters": [
+            "Memocept Brain Health Support",
+            "Treating Adolescent Acne with Isotretinoin"
+        ]
+    },
+    {
+        "cluster": 15,
+        "label": "Texas Farmers Celebrate Wellness in Dallas.",
+        "volume": 18,
+        "subclusters": [
+            "Illinois Farmers Adopt Sustainable Conservation Practices.",
+            "South Dallas Urban Agriculture Celebration.",
+            "Unknown",
+            "Wellness-driven Texas restaurant brand."
+        ]
+    },
+    {
+        "cluster": 16,
+        "label": "Hybrid SUV leads Philippine market growth.",
+        "volume": 25,
+        "subclusters": [
+            "Electric Vehicle Adoption in the Philippines.",
+            "Electric vehicle adoption accelerates slowly.",
+            "Electrifying Fleet Leasing for Sustainable Growth",
+            "Toyota Rav4 Hybrid Dominates Automotive Market.",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 17,
+        "label": "Expert Skin Restoration in Delhi Clinic.",
+        "volume": 14,
+        "subclusters": [
+            "Delhi Hair and Skin Restoration Services.",
+            "Expert Skin Care at Your Clinic",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 18,
+        "label": "Quirky British Village Life",
+        "volume": 12,
+        "subclusters": [
+            "Quirky British humor in rural England."
+        ]
+    },
+    {
+        "cluster": 19,
+        "label": "Russian Orthodox Identity Unfolds Amid Chaos",
+        "volume": 45,
+        "subclusters": [
+            "Russian Empire's Bloody 1905 Uprising",
+            "Russian Orthodox Identity Emerges",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 20,
+        "label": "Young men face modern emotional struggles.",
+        "volume": 14,
+        "subclusters": [
+            "Men struggle to express emotional pain.",
+            "Unknown",
+            "Youth Struggle with Modern Stress."
+        ]
+    },
+    {
+        "cluster": 21,
+        "label": "Real Estate Market Trust Issues",
+        "volume": 15,
+        "subclusters": [
+            "Buyers Rate Real Estate Agents",
+            "Zillow Faces Real Estate Controversy"
+        ]
+    },
+    {
+        "cluster": 22,
+        "label": "Guiding a Grandchild's Emotional Growth",
+        "volume": 12,
+        "subclusters": [
+            "Balancing Discipline and Emotional Support",
+            "Navigating Grandparent-Grandchild Relationships.",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 23,
+        "label": "Emily's Bittersweet Childhood Journey",
+        "volume": 17,
+        "subclusters": [
+            "Emily's Journey Through Childhood Loss"
+        ]
+    },
+    {
+        "cluster": 24,
+        "label": "Vicious Rivalry in the Fighting Ring",
+        "volume": 15,
+        "subclusters": [
+            "Tekken series faces intense backlash."
+        ]
+    },
+    {
+        "cluster": 25,
+        "label": "Notorious gangland crime wave unfolds.",
+        "volume": 49,
+        "subclusters": [
+            "Notorious Nottinghamshire gangland crime wave.",
+            "Police officers face gruesome reality.",
+            "Stefanie's Mysterious Disappearance in Rural Maine",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 26,
+        "label": "Irvine Waste Management System",
+        "volume": 16,
+        "subclusters": [
+            "Managing Irvine's Waste Disposal Effectively"
+        ]
+    },
+    {
+        "cluster": 27,
+        "label": "Customizable Remote Gaming Experience",
+        "volume": 18,
+        "subclusters": [
+            "Customizable Gaming PC Setup",
+            "Remote Access Virtual Server Control",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 28,
+        "label": "Lagos' Education Crisis Under Hamzat's Rule",
+        "volume": 24,
+        "subclusters": [
+            "Lagos Governance Faces Hamzat's Leadership Challenge",
+            "Nigeria's Education Infrastructure Expansion Efforts",
+            "Nigeria's Rising Insecurity Threatens Innocent Lives",
+            "Nigerian Party Emerges from Mass Mobilization",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 29,
+        "label": "Sustainable Fashion Revolution in UAE",
+        "volume": 17,
+        "subclusters": [
+            "\"UAE Circular Fashion Revolution\"",
+            "Reducing Waste Through Recycling Efforts",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 30,
+        "label": "Trump's Presidential Blunder",
+        "volume": 12,
+        "subclusters": [
+            "Trump's Embarrassing Presidential Blunder"
+        ]
+    },
+    {
+        "cluster": 31,
+        "label": "Football Unites Diverse Communities Globally",
+        "volume": 141,
+        "subclusters": [
+            "Beckham Prepares for 2026 Tournament",
+            "Brad Loses Title and Respect",
+            "Cooper Kupp's Seahawks Football Legacy",
+            "Cowboys Seek Wise Defensive End Draft Pick",
+            "Emergence of Talented Goalkeepers",
+            "Freeman's Pitching Dominates the Game.",
+            "Government Corruption Taints Global Sports.",
+            "Jaylen Edwards' NBA Rise Continues",
+            "Kansas City Chiefs Make Key Trades",
+            "Middlesbrough's Frustrating Midtable Years",
+            "NBA Commissioner Faces Scandalous Future",
+            "South American Football Unites Diverse Nations.",
+            "Tuchel Backs Kane's England Form",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 32,
+        "label": "Cyber War Hits Sri Lanka",
+        "volume": 16,
+        "subclusters": [
+            "Sri Lanka Faces Economic Crisis.",
+            "Sri Lanka Fights Global Cyber Threats",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 33,
+        "label": "Global Brands Connect the World",
+        "volume": 16,
+        "subclusters": [
+            "\"Smart Brands Optimize Content Creation\"",
+            "Global Logistics Conference Connects World Enterprises",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 34,
+        "label": "East Africa's Economic Gold Rush",
+        "volume": 47,
+        "subclusters": [
+            "East Africa's Economic Growth Surge",
+            "Gold Exploration in Eureka County",
+            "Middle East Economic Global Instability Risks",
+            "Ukraine's Energy Security Amid War",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 35,
+        "label": "Rare Earth Investment Opportunities",
+        "volume": 13,
+        "subclusters": [
+            "Rare Earth Stocks Investment Opportunity"
+        ]
+    },
+    {
+        "cluster": 36,
+        "label": "Kolkata's Cricketer Rises to Fame",
+        "volume": 26,
+        "subclusters": [
+            "African cricketer rises to fame.",
+            "Kolkata Knight Riders' batting struggles continue.",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 37,
+        "label": "Nvidia powers AI's global expansion.",
+        "volume": 33,
+        "subclusters": [
+            "AI Enhances Human Productivity",
+            "Amazon's AI Future Unfolds",
+            "Nvidia Expands in China AI Market.",
+            "Nvidia's Dominant Chip Technology Empire",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 38,
+        "label": "Middle East Conflict Sparks Global Turmoil",
+        "volume": 57,
+        "subclusters": [
+            "Global Economic Imbalance Unfolds",
+            "Market Turmoil Hits Wall Street",
+            "Middle East Conflict Escalates",
+            "Stock Market Sees Sudden Sharp Rally.",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 39,
+        "label": "New York City Faces Economic Strain",
+        "volume": 17,
+        "subclusters": [
+            "Global Warning Ignites International Concern",
+            "New York City Faces Economic Strain"
+        ]
+    }
+]
