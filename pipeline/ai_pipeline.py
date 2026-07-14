@@ -2,6 +2,20 @@ import hashlib
 import json
 from collections import Counter
 
+from config.settings import (
+    ANALYTICS_DIR,
+    ARTIFACT_DIR,
+    EMBEDDING_MODEL,
+    CHUNK_SIZE,
+    FINAL_RERANK_K,
+    GLOBAL_RETRIEVAL_K,
+    MIN_CHUNK_LENGTH,
+    MIN_CLUSTER_SIZE,
+    MIN_CONFIDENCE,
+    MIN_SAMPLES,
+    TOP_CLUSTERS,
+    VECTORSTORE_DIR,
+)
 from embeddings.embedding_services import EmbeddingService
 from vectorstore.faiss_store import VectorStore
 from intelligence.rag_engine import RAGEngine
@@ -30,6 +44,7 @@ from analytics.narrative.early_warning_engine import EarlyWarningEngine
 from analytics.evaluation.forecast_evaluator import ForecastEvaluator
 from analytics.evaluation.correlation_evaluator import CorrelationEvaluator
 from analytics.evaluation.label_audit import LabelAudit
+from processing.data_quality_firewall import DataQualityFirewall
 from outputs.reports.intelligence_brief import (
     IntelligenceBriefGenerator
 )
@@ -57,12 +72,18 @@ class AIPipeline:
 
         self.vector_store = None
         self.evaluation_logger = EvaluationLogger()
+        self.timeline = None
+        self.forecasts = None
+        self.early_warnings = None
+        self.influence_scores = None
+        self.executive_brief = None
+        self.strategic_context = None
 
     # ---------------------------------------------------
     # TEXT CHUNKING
     # ---------------------------------------------------
 
-    def chunk_text(self, text, chunk_size=300):
+    def chunk_text(self, text, chunk_size=CHUNK_SIZE):
 
         words = text.split()
         chunks = []
@@ -71,7 +92,7 @@ class AIPipeline:
 
             chunk = " ".join(words[i:i + chunk_size])
 
-            if len(chunk.strip()) > 50:
+            if len(chunk.strip()) > MIN_CHUNK_LENGTH:
                 chunks.append(chunk)
 
         return chunks
@@ -94,7 +115,7 @@ class AIPipeline:
             ).hexdigest()
 
         build_info = artifact_manager.load_json(
-            "artifacts/build_info.json"
+            f"{ARTIFACT_DIR}/build_info.json"
         )
 
         if (
@@ -108,7 +129,7 @@ class AIPipeline:
             and
 
             artifact_manager.exists(
-                "artifacts/vectorstore/faiss.index"
+                f"{VECTORSTORE_DIR}/faiss.index"
             )
 
         ):
@@ -117,56 +138,32 @@ class AIPipeline:
             print("Loading existing artifacts...\n")
 
             self.clustered_chunks = artifact_manager.load_json(
-                "artifacts/clustered_chunks.json"
+                f"{ARTIFACT_DIR}/clustered_chunks.json"
             )
 
             self.cluster_labels = artifact_manager.load_json(
-                "artifacts/cluster_labels.json"
+                f"{ARTIFACT_DIR}/cluster_labels.json"
             )
 
             self.subcluster_labels = artifact_manager.load_json(
-                "artifacts/subcluster_labels.json"
+                f"{ARTIFACT_DIR}/subcluster_labels.json"
             )
 
             self.cluster_groups = artifact_manager.load_json(
-                "artifacts/cluster_groups.json"
+                f"{ARTIFACT_DIR}/cluster_groups.json"
             )
 
             self.vector_store = VectorStore.load(
-                "artifacts/vectorstore"
+                VECTORSTORE_DIR
             )
-
-            if artifact_manager.analytics_exist():
-
-                print("✅ Analytics cache found.")
-
-                self.timeline = artifact_manager.load_json(
-                    "artifacts/analytics/timeline.json"
-                )
-
-                self.forecasts = artifact_manager.load_json(
-                    "artifacts/analytics/forecasts.json"
-                )
-
-                self.early_warnings = artifact_manager.load_json(
-                    "artifacts/analytics/early_warnings.json"
-                )
-
-                self.influence_scores = artifact_manager.load_json(
-                    "artifacts/analytics/influence_scores.json"
-                )
-
-                self.executive_brief = artifact_manager.load_json(
-                    "artifacts/analytics/executive_brief.json"
-                )
-
-                print("✅ Analytics loaded.")
 
             print("✅ Vanguard loaded from artifacts.")
             return
 
         all_chunks = []
         purifier = DocumentPurifier()
+        firewall = DataQualityFirewall()
+        existing_hashes = set()
 
         for article in articles:
 
@@ -177,6 +174,17 @@ class AIPipeline:
             # PURIFY DOCUMENT
             #---------------------------------------------------
             cleaned = purifier.clean(article["content"])
+
+            #---------------------------------------------------
+            # FIREWALL CHECK
+            #---------------------------------------------------
+            valid, reason = firewall.validate(
+                cleaned,
+                existing_hashes
+            )
+
+            if not valid:
+                continue
 
             #---------------------------------------------------
             # QUALITY CHECK
@@ -221,8 +229,8 @@ class AIPipeline:
         self.initial_cluster_labels = {}
 
         clusterer = HDBSCANClusterer(
-            min_cluster_size=12,
-            min_samples=4
+            min_cluster_size=MIN_CLUSTER_SIZE,
+            min_samples=MIN_SAMPLES
         )
 
         labels = clusterer.cluster(embeddings)
@@ -553,7 +561,7 @@ class AIPipeline:
         )
 
         self.vector_store.save(
-            "artifacts/vectorstore"
+            VECTORSTORE_DIR
         )
 
         self.clustered_chunks = clustered_chunks
@@ -605,7 +613,7 @@ class AIPipeline:
 
         build_info = {
             "dataset_hash": dataset_hash,
-            "embedding_model": "all-MiniLM-L6-v2",
+            "embedding_model": EMBEDDING_MODEL,
             "num_chunks": len(clustered_chunks)
         }
 
@@ -615,6 +623,8 @@ class AIPipeline:
         )
 
         print("✅ Build information saved.")
+
+        firewall.print_report()
 
         print(
             "Vector DB built with",
@@ -636,14 +646,14 @@ class AIPipeline:
 
         initial_results = self.vector_store.search(
             query_embedding,
-            k=30
+            k=GLOBAL_RETRIEVAL_K
         )
 
         clusters = [r["cluster"] for r in initial_results]
 
         top_clusters = [
             c[0]
-            for c in Counter(clusters).most_common(2)
+            for c in Counter(clusters).most_common(TOP_CLUSTERS)
         ]
 
         print("\n🎯 Top Narrative Clusters:\n")
@@ -686,7 +696,7 @@ class AIPipeline:
             cluster_results = self.vector_store.search_in_cluster(
                 query_embedding,
                 cluster_id,
-                k=15
+                k=GLOBAL_RETRIEVAL_K // TOP_CLUSTERS
             )
 
             all_results.extend(cluster_results)
@@ -703,7 +713,7 @@ class AIPipeline:
 
             max_per_subcluster=2,
 
-            top_k=8
+            top_k=FINAL_RERANK_K
 
         )
         # ---------------------------------------------
@@ -745,7 +755,7 @@ class AIPipeline:
             "min_score": min(scores)
         }
 
-        if avg_score < 0.30:
+        if avg_score < MIN_CONFIDENCE:
 
             return (
                 "Insufficient narrative evidence found "
@@ -845,21 +855,38 @@ class AIPipeline:
     # MAIN LOOP
     # ---------------------------------------------------
 
-    def run(self):
-        logger = EvaluationLogger()
+    def run_analytics(self, force_rebuild=False):
         artifact_manager = ArtifactManager()
+        logger = EvaluationLogger()
 
-        print("Loading processed data...")
+        if not force_rebuild and artifact_manager.analytics_exist():
 
-        with open(
-            "data_lake/processed/enriched_articles.json",
-            "r",
-            encoding="utf-8"
-        ) as f:
+            self.timeline = artifact_manager.load_json(
+                f"{ANALYTICS_DIR}/timeline.json"
+            )
 
-            articles = json.load(f)
+            self.forecasts = artifact_manager.load_json(
+                f"{ANALYTICS_DIR}/forecasts.json"
+            )
 
-        self.build_vector_db(articles)
+            self.early_warnings = artifact_manager.load_json(
+                f"{ANALYTICS_DIR}/early_warnings.json"
+            )
+
+            self.influence_scores = artifact_manager.load_json(
+                f"{ANALYTICS_DIR}/influence_scores.json"
+            )
+
+            self.executive_brief = artifact_manager.load_json(
+                f"{ANALYTICS_DIR}/executive_brief.json"
+            )
+
+            self.strategic_context = artifact_manager.load_json(
+                f"{ANALYTICS_DIR}/strategic_context.json"
+            )
+
+            print("✅ Using cached analytics.")
+            return
 
         timeline_engine = TimelineEngine()
         timeline_engine.build(
@@ -867,6 +894,8 @@ class AIPipeline:
             self.cluster_labels
         )
         timeline_engine.display()
+
+        self.timeline = timeline_engine.timeline
 
         # ---------------------------------------------------
         # SPIKE DETECTION
@@ -884,7 +913,6 @@ class AIPipeline:
             "spike_report",
             spikes
         )
-
 
         # ---------------------------------------------------
         # EMERGING NARRATIVE DETECTION
@@ -911,7 +939,7 @@ class AIPipeline:
             self.cluster_labels
         )
         evolution_report = evolution_engine.detect_evolution(
-            temporal_clusters   
+            temporal_clusters
         )
         evolution_engine.display(evolution_report)
 
@@ -966,7 +994,7 @@ class AIPipeline:
         )
 
         artifact_manager.save_json(
-            "artifacts/analytics/timeline.json",
+            f"{ANALYTICS_DIR}/timeline.json",
             timeline_engine.timeline
         )
 
@@ -1005,7 +1033,7 @@ class AIPipeline:
         # NARRATIVE GRAPH
         # ---------------------------------------------------
 
-        graph_engine = TopKGraph(k=3, min_similarity=0.30)
+        graph_engine = TopKGraph(k=3, min_similarity=MIN_CONFIDENCE)
 
         graph = graph_engine.build(
 
@@ -1026,7 +1054,6 @@ class AIPipeline:
             communities,
             graph
         )
-
 
         centrality = CentralityAnalyzer()
 
@@ -1066,13 +1093,14 @@ class AIPipeline:
             influence_scores
         )
 
+        self.influence_scores = influence_scores
+
         artifact_manager.save_json(
-            "artifacts/analytics/influence_scores.json",
+            f"{ANALYTICS_DIR}/influence_scores.json",
             influence_scores
         )
 
         print("✅ Influence scores saved.")
-
 
         mapper = InfluenceMapper()
 
@@ -1083,6 +1111,21 @@ class AIPipeline:
 
         mapper.display(
             mappings
+        )
+
+        diagnostics_engine = GraphDiagnostics()
+
+        diagnostics = diagnostics_engine.analyze(
+
+            self.cluster_groups,
+
+            self.cluster_labels
+        )
+
+        diagnostics_engine.display(diagnostics)
+        logger.save(
+            "graph_diagnostics",
+            diagnostics
         )
 
         # ---------------------------------------------------
@@ -1110,8 +1153,10 @@ class AIPipeline:
             forecasts
         )
 
+        self.forecasts = forecasts
+
         artifact_manager.save_json(
-            "artifacts/analytics/forecasts.json",
+            f"{ANALYTICS_DIR}/forecasts.json",
             forecasts
         )
 
@@ -1150,7 +1195,6 @@ class AIPipeline:
         evaluator.display(
 
             evaluation_results
-
         )
 
         logger.save(
@@ -1175,8 +1219,10 @@ class AIPipeline:
             warnings
         )
 
+        self.early_warnings = warnings
+
         artifact_manager.save_json(
-            "artifacts/analytics/early_warnings.json",
+            f"{ANALYTICS_DIR}/early_warnings.json",
             warnings
         )
 
@@ -1280,24 +1326,17 @@ class AIPipeline:
 
         )
 
+        self.executive_brief = executive_brief
+
         artifact_manager.save_json(
-            "artifacts/analytics/executive_brief.json",
+            f"{ANALYTICS_DIR}/executive_brief.json",
             executive_brief
-        )
-
-        # ---------------------------------------------------
-        # STRATEGIC CONTEXT
-        # ---------------------------------------------------
-
-        strategic_builder = (
-
-            StrategicContextBuilder()
-
         )
 
         self.strategic_context = (
 
-            strategic_builder.build(
+            StrategicContextBuilder()
+            .build(
 
                 forecasts,
 
@@ -1309,6 +1348,11 @@ class AIPipeline:
 
             )
 
+        )
+
+        artifact_manager.save_json(
+            f"{ANALYTICS_DIR}/strategic_context.json",
+            self.strategic_context
         )
 
         # ---------------------------------------------------
@@ -1338,7 +1382,6 @@ class AIPipeline:
         corr_evaluator.display(
 
             corr_results
-
         )
 
         logger.save(
@@ -1368,9 +1411,21 @@ class AIPipeline:
             diagnostics
         )
 
+    def run(self):
+        print("Loading processed data...")
 
+        with open(
+            "data_lake/processed/enriched_articles.json",
+            "r",
+            encoding="utf-8"
+        ) as f:
 
-        print("Ready for queries!\n")
+            articles = json.load(f)
+
+        self.build_vector_db(articles)
+        self.run_analytics()
+
+        print("Ready for queries!")
 
         while True:
 
@@ -1380,18 +1435,9 @@ class AIPipeline:
                 break
 
             response, retrieval_stats = self.query(q)
-            
-
 
             print("\n🧠 Intelligence Report:\n")
 
             print(response)
 
             print("\n" + "=" * 60 + "\n")
-
-
-if __name__ == "__main__":
-
-    pipeline = AIPipeline()
-
-    pipeline.run()

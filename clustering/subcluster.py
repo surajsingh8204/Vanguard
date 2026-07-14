@@ -1,14 +1,16 @@
 import hdbscan
 import numpy as np
 
+from config.settings import MIN_SAMPLES, MIN_SUBCLUSTER_SIZE
+
 
 class SubClusterer:
 
-    def __init__(self, min_cluster_size=3):
+    def __init__(self, min_cluster_size=MIN_SUBCLUSTER_SIZE, min_samples=MIN_SAMPLES):
 
         self.model = hdbscan.HDBSCAN(
             min_cluster_size=min_cluster_size,
-            min_samples=2,
+            min_samples=min_samples,
             metric='euclidean'
         )
 

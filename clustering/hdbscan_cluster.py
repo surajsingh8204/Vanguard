@@ -1,10 +1,12 @@
 import hdbscan
 import numpy as np
 
+from config.settings import MIN_CLUSTER_SIZE, MIN_SAMPLES
+
 
 class HDBSCANClusterer:
 
-    def __init__(self, min_cluster_size=5, min_samples=2):
+    def __init__(self, min_cluster_size=MIN_CLUSTER_SIZE, min_samples=MIN_SAMPLES):
 
         print("Initializing HDBSCAN...")
 

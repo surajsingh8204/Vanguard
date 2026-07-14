@@ -163,7 +163,8 @@ class ArtifactManager:
             "artifacts/analytics/forecasts.json",
             "artifacts/analytics/early_warnings.json",
             "artifacts/analytics/influence_scores.json",
-            "artifacts/analytics/executive_brief.json"
+            "artifacts/analytics/executive_brief.json",
+            "artifacts/analytics/strategic_context.json"
         ]
 
         return all(

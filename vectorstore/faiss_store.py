@@ -4,6 +4,8 @@ import os
 import faiss
 import numpy as np
 
+from config.settings import GLOBAL_RETRIEVAL_K, TOP_CLUSTERS
+
 
 def normalize(vectors):
     return vectors / np.linalg.norm(vectors, axis=1, keepdims=True)
@@ -185,7 +187,7 @@ class VectorStore:
 
         return store
 
-    def search(self, query_embedding, k=5):
+    def search(self, query_embedding, k=GLOBAL_RETRIEVAL_K):
 
         query_embedding = np.array([query_embedding]).astype("float32")
         query_embedding = normalize(query_embedding)
@@ -210,7 +212,7 @@ class VectorStore:
         return results
 
     # 🔥 TRUE cluster search
-    def search_in_cluster(self, query_embedding, cluster_id, k=5):
+    def search_in_cluster(self, query_embedding, cluster_id, k=GLOBAL_RETRIEVAL_K // TOP_CLUSTERS):
 
         query_embedding = np.array([query_embedding]).astype("float32")
         query_embedding = normalize(query_embedding)

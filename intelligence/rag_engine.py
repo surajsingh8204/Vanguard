@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from matplotlib.style import context
 
+from config.settings import LLM_MODEL
+
 load_dotenv()
 
 
@@ -30,7 +32,7 @@ class RAGEngine:
 
         print("\n========== RAG DEBUG ==========")
         print("API KEY EXISTS:", bool(os.getenv("GROQ_API_KEY")))
-        print("MODEL:", "llama-3.1-8b-instant")
+        print("MODEL:", LLM_MODEL)
         print("QUERY:", query[:50])
         print("CONTEXT CHARS:", len(retrieval_context))
         print("CONTEXT WORDS:", len(retrieval_context.split()))
@@ -66,7 +68,7 @@ Instructions:
 """
 
         response = self.client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model=LLM_MODEL,
             messages=[
                 {"role": "user", "content": prompt}
             ]

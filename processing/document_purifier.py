@@ -4,34 +4,86 @@ import re
 class DocumentPurifier:
 
     def __init__(self):
-
-        # ---------------------------------------------
-        # noisy patterns
-        # ---------------------------------------------
-
         self.noise_patterns = [
-
             r"for additional information.*",
             r"contact:.*",
             r"read more.*",
             r"related articles.*",
             r"recommended stories.*",
+            r"recommended for you.*",
             r"click here.*",
             r"follow us.*",
             r"subscribe.*",
+            r"sign up.*",
             r"all rights reserved.*",
             r"copyright.*",
             r"advertisement.*",
             r"newsletter.*",
             r"share this article.*",
+            r"share on.*",
             r"watch live.*",
-
+            r"related story.*",
+            r"you may also like.*",
             r"phone\s*\+?\d+.*",
             r"e-mail:.*",
             r"email:.*",
-
-            r"###.*"
+            r"mailto:.*",
+            r"https?://\S+",
+            r"###.*",
         ]
+
+        self.compiled_patterns = [
+            re.compile(pattern, re.IGNORECASE)
+            for pattern in self.noise_patterns
+        ]
+
+        self.inline_noise_terms = [
+            "copyright",
+            "advertisement",
+            "newsletter",
+            "related articles",
+            "recommended stories",
+            "share this article",
+            "phone",
+            "email",
+            "e-mail",
+        ]
+
+    def _strip_noise_lines(self, text):
+
+        cleaned_lines = []
+
+        for line in text.splitlines():
+
+            candidate = line.strip()
+
+            if not candidate:
+                continue
+
+            lowered = candidate.lower()
+
+            if any(term in lowered for term in self.inline_noise_terms):
+                continue
+
+            if any(pattern.search(candidate) for pattern in self.compiled_patterns):
+                continue
+
+            cleaned_lines.append(candidate)
+
+        return "\n".join(cleaned_lines)
+
+    def _remove_inline_boilerplate(self, text):
+
+        cleaned = text
+
+        for pattern in self.compiled_patterns:
+            cleaned = pattern.sub(" ", cleaned)
+
+        return cleaned
+
+    def _normalize_whitespace(self, text):
+
+        return re.sub(r"\s+", " ", text).strip()
 
     # ---------------------------------------------------
     # CLEAN TEXT
@@ -42,28 +94,11 @@ class DocumentPurifier:
         if not text:
             return ""
 
-        text = text.lower()
+        text = self._strip_noise_lines(text)
+        text = self._remove_inline_boilerplate(text)
+        text = self._normalize_whitespace(text)
 
-        # ---------------------------------------------
-        # remove noisy blocks
-        # ---------------------------------------------
-
-        for pattern in self.noise_patterns:
-
-            text = re.sub(
-                pattern,
-                "",
-                text,
-                flags=re.IGNORECASE | re.DOTALL
-            )
-
-        # ---------------------------------------------
-        # remove excessive whitespace
-        # ---------------------------------------------
-
-        text = re.sub(r"\s+", " ", text)
-
-        return text.strip()
+        return text
 
     # ---------------------------------------------------
     # QUALITY CHECK
@@ -74,18 +109,10 @@ class DocumentPurifier:
         if not text:
             return False
 
-        # too short
-        if len(text.split()) < 80:
+        if len(text.split()) < 40:
             return False
 
-        # too many separators = likely merged junk
-        bad_tokens = [
-            "...",
-            "###",
-            "|",
-            ">>",
-            "<<"
-        ]
+        bad_tokens = ["...", "###", "|", ">>", "<<"]
 
         bad_count = sum(
             text.count(t)
