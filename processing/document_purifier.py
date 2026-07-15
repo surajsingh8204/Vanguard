@@ -1,125 +1,111 @@
+from __future__ import annotations
+
 import re
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass(slots=True)
+class PurifierReport:
+    attempted: int = 0
+    changed: int = 0
+    unchanged: int = 0
 
 
 class DocumentPurifier:
+    """Clean article text without validating acceptance quality."""
 
-    def __init__(self):
-        self.noise_patterns = [
-            r"for additional information.*",
-            r"contact:.*",
-            r"read more.*",
-            r"related articles.*",
-            r"recommended stories.*",
-            r"recommended for you.*",
-            r"click here.*",
-            r"follow us.*",
-            r"subscribe.*",
-            r"sign up.*",
-            r"all rights reserved.*",
-            r"copyright.*",
-            r"advertisement.*",
-            r"newsletter.*",
-            r"share this article.*",
-            r"share on.*",
-            r"watch live.*",
-            r"related story.*",
-            r"you may also like.*",
-            r"phone\s*\+?\d+.*",
-            r"e-mail:.*",
-            r"email:.*",
-            r"mailto:.*",
-            r"https?://\S+",
-            r"###.*",
-        ]
-
-        self.compiled_patterns = [
+    def __init__(self) -> None:
+        self.report = PurifierReport()
+        self._line_patterns = tuple(
             re.compile(pattern, re.IGNORECASE)
-            for pattern in self.noise_patterns
-        ]
+            for pattern in (
+                r"^\s*copyright\b.*$",
+                r"^\s*all rights reserved\b.*$",
+                r"^\s*recommended stories\b.*$",
+                r"^\s*recommended for you\b.*$",
+                r"^\s*related articles\b.*$",
+                r"^\s*related story\b.*$",
+                r"^\s*you may also like\b.*$",
+                r"^\s*share (this article|on)\b.*$",
+                r"^\s*follow us\b.*$",
+                r"^\s*newsletter\b.*$",
+                r"^\s*subscribe\b.*$",
+                r"^\s*sign up\b.*$",
+                r"^\s*click here\b.*$",
+                r"^\s*read more\b.*$",
+                r"^\s*watch live\b.*$",
+                r"^\s*(menu|home|privacy policy|terms of service|cookie preferences)\b.*$",
+            )
+        )
+        self._email_pattern = re.compile(r"\b[\w.+-]+@[\w-]+\.[\w.-]+\b", re.IGNORECASE)
+        self._phone_pattern = re.compile(r"\+?\d[\d\s().-]{7,}\d")
+        self._share_url_pattern = re.compile(r"https?://\S+", re.IGNORECASE)
+        self._space_pattern = re.compile(r"\s+")
 
-        self.inline_noise_terms = [
-            "copyright",
-            "advertisement",
-            "newsletter",
-            "related articles",
-            "recommended stories",
-            "share this article",
-            "phone",
-            "email",
-            "e-mail",
-        ]
+    def clean_batch(self, articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        self.report = PurifierReport(attempted=len(articles))
+        cleaned_articles: list[dict[str, Any]] = []
 
-    def _strip_noise_lines(self, text):
+        for article in articles:
+            cleaned_article = dict(article)
+            original_content = str(article.get("content", ""))
+            cleaned_content = self.clean(original_content)
+            cleaned_article["content"] = cleaned_content
+            cleaned_article["word_count"] = len(cleaned_content.split())
 
-        cleaned_lines = []
+            if cleaned_content != original_content:
+                self.report.changed += 1
+            else:
+                self.report.unchanged += 1
 
-        for line in text.splitlines():
+            cleaned_articles.append(cleaned_article)
 
-            candidate = line.strip()
+        self.print_report()
+        return cleaned_articles
 
-            if not candidate:
-                continue
-
-            lowered = candidate.lower()
-
-            if any(term in lowered for term in self.inline_noise_terms):
-                continue
-
-            if any(pattern.search(candidate) for pattern in self.compiled_patterns):
-                continue
-
-            cleaned_lines.append(candidate)
-
-        return "\n".join(cleaned_lines)
-
-    def _remove_inline_boilerplate(self, text):
-
-        cleaned = text
-
-        for pattern in self.compiled_patterns:
-            cleaned = pattern.sub(" ", cleaned)
-
-        return cleaned
-
-    def _normalize_whitespace(self, text):
-
-        return re.sub(r"\s+", " ", text).strip()
-
-    # ---------------------------------------------------
-    # CLEAN TEXT
-    # ---------------------------------------------------
-
-    def clean(self, text):
-
+    def clean(self, text: str) -> str:
         if not text:
             return ""
 
-        text = self._strip_noise_lines(text)
-        text = self._remove_inline_boilerplate(text)
-        text = self._normalize_whitespace(text)
+        lines = []
+        for line in text.splitlines():
+            candidate = line.strip()
+            if not candidate:
+                continue
+            if any(pattern.search(candidate) for pattern in self._line_patterns):
+                continue
+            lines.append(candidate)
 
-        return text
+        cleaned = "\n".join(lines)
+        cleaned = self._email_pattern.sub(" ", cleaned)
+        cleaned = self._phone_pattern.sub(" ", cleaned)
+        cleaned = self._share_url_pattern.sub(" ", cleaned)
+        cleaned = self._space_pattern.sub(" ", cleaned)
+        return cleaned.strip()
 
-    # ---------------------------------------------------
-    # QUALITY CHECK
-    # ---------------------------------------------------
-
-    def is_valid(self, text):
-
+    def is_valid(self, text: str) -> bool:
         if not text:
             return False
 
         if len(text.split()) < 40:
             return False
 
-        bad_tokens = ["...", "###", "|", ">>", "<<"]
+        bad_tokens = ("...", "###", "|", ">>", "<<")
+        bad_count = sum(text.count(token) for token in bad_tokens)
+        return bad_count <= 15
 
-        bad_count = sum(
-            text.count(t)
-            for t in bad_tokens
-        )
-
-        if bad_count > 15:
-            return False
-
-        return True
+    def print_report(self) -> None:
+        print("========================================")
+        print()
+        print("PURIFIER REPORT")
+        print()
+        print("========================================")
+        print()
+        print(f"Attempted: {self.report.attempted}")
+        print()
+        print(f"Changed: {self.report.changed}")
+        print()
+        print(f"Unchanged: {self.report.unchanged}")
+        print()
+        print("========================================")

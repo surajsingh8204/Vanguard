@@ -1,6 +1,9 @@
 import hashlib
 import json
+import logging
+import re
 from collections import Counter
+from typing import Any
 
 from config.settings import (
     ANALYTICS_DIR,
@@ -60,6 +63,8 @@ from intelligence.strategic_context_builder import (
 
 from utils.artifact_manager import ArtifactManager
 
+logger = logging.getLogger(__name__)
+
 class AIPipeline:
 
     def __init__(self):
@@ -78,6 +83,14 @@ class AIPipeline:
         self.influence_scores = None
         self.executive_brief = None
         self.strategic_context = None
+        self.query_synonyms = {
+            "fifa world cup": ["football", "soccer", "world cup", "fifa", "international football"],
+            "ukraine": ["kyiv", "russia", "ukrainian", "moscow"],
+            "nato": ["alliance", "atlantic alliance", "member states"],
+            "tariffs": ["trade barriers", "import duties", "trade policy"],
+            "sanctions": ["penalties", "economic restrictions", "blacklist"],
+            "ceasefire": ["truce", "peace talks", "negotiation"],
+        }
 
     # ---------------------------------------------------
     # TEXT CHUNKING
@@ -128,6 +141,10 @@ class AIPipeline:
 
             and
 
+            build_info.get("retrieval_quality_version") == 2
+
+            and
+
             artifact_manager.exists(
                 f"{VECTORSTORE_DIR}/faiss.index"
             )
@@ -152,6 +169,24 @@ class AIPipeline:
             self.cluster_groups = artifact_manager.load_json(
                 f"{ARTIFACT_DIR}/cluster_groups.json"
             )
+
+            self.cluster_labels = {
+                int(key): value
+                for key, value in self.cluster_labels.items()
+            }
+
+            self.subcluster_labels = {
+                int(cluster_id): {
+                    int(subcluster_id): label
+                    for subcluster_id, label in subclusters.items()
+                }
+                for cluster_id, subclusters in self.subcluster_labels.items()
+            }
+
+            self.cluster_groups = {
+                int(cluster_id): items
+                for cluster_id, items in self.cluster_groups.items()
+            }
 
             self.vector_store = VectorStore.load(
                 VECTORSTORE_DIR
@@ -196,13 +231,19 @@ class AIPipeline:
             # CHUNKING
             #---------------------------------------------------
             chunks = self.chunk_text(cleaned)
-            article_date = article.get("date", "unknown")
+            metadata = self._prepare_article_metadata(article)
             for chunk in chunks:
 
-                all_chunks.append({
+                chunk_record = {
                     "text": chunk,
-                    "date": article_date
-                })
+                    "title": metadata["title"],
+                    "source": metadata["source"],
+                    "date": metadata["date"],
+                    "country": metadata["country"],
+                    "language": metadata["language"],
+                    "topic": metadata["topic"],
+                }
+                all_chunks.append(self._validate_chunk_metadata(chunk_record))
 
         print("Total chunks:", len(all_chunks))
 
@@ -258,7 +299,12 @@ class AIPipeline:
             cluster_groups[label].append({
                 "text": all_chunks[i]["text"],
                 "embedding": embeddings[i],
-                "date": all_chunks[i]["date"]
+                "date": all_chunks[i]["date"],
+                "title": all_chunks[i].get("title"),
+                "source": all_chunks[i].get("source"),
+                "country": all_chunks[i].get("country"),
+                "language": all_chunks[i].get("language"),
+                "topic": all_chunks[i].get("topic"),
             })
 
         print("Main clusters found:", len(cluster_groups))
@@ -281,10 +327,7 @@ class AIPipeline:
             # GENERATE MAIN CLUSTER LABEL
             # ---------------------------------------------------
 
-            cluster_texts = [
-                x["text"]
-                for x in items
-            ]
+            cluster_texts = items
 
             cluster_label = labeler.generate_label(
                 cluster_texts
@@ -307,7 +350,7 @@ class AIPipeline:
 
                 small_cluster_texts = [
 
-                    x["text"]
+                    x
 
                     for x in items
 
@@ -333,7 +376,12 @@ class AIPipeline:
                         "text": item["text"],
                         "cluster": int(main_cluster),
                         "subcluster": 0,
-                        "date": item["date"]
+                        "topic": label,
+                        "title": item.get("title"),
+                        "source": item.get("source"),
+                        "date": item.get("date"),
+                        "country": item.get("country"),
+                        "language": item.get("language"),
                     })
 
                     filtered_embeddings.append(item["embedding"])
@@ -397,13 +445,7 @@ class AIPipeline:
                 if sub_id == -1:
                     continue
 
-                subcluster_groups[
-                    sub_id
-                ].append(
-
-                    items[idx]["text"]
-
-                )
+                subcluster_groups[sub_id].append(items[idx])
 
             # ---------------------------------------------
             # GENERATE LABELS
@@ -417,9 +459,7 @@ class AIPipeline:
 
                 label = (
 
-                    labeler.generate_label(
-                        texts
-                    )
+                    labeler.generate_label(texts)
 
                 )
 
@@ -431,11 +471,23 @@ class AIPipeline:
 
             for idx, item in enumerate(items):
 
+                subcluster_label = self.subcluster_labels[
+                    int(main_cluster)
+                ].get(
+                    int(sub_labels[idx]),
+                    cluster_label,
+                )
+
                 clustered_chunks.append({
                     "text": item["text"],
                     "cluster": int(main_cluster),
                     "subcluster": int(sub_labels[idx]),
-                    "date": item["date"]
+                    "topic": subcluster_label or cluster_label,
+                    "title": item.get("title"),
+                    "source": item.get("source"),
+                    "date": item.get("date"),
+                    "country": item.get("country"),
+                    "language": item.get("language"),
                 })
 
                 filtered_embeddings.append(item["embedding"])
@@ -497,9 +549,7 @@ class AIPipeline:
                     )
                 )
 
-            self.cluster_labels[
-                cluster_id
-            ] = rebuilt_label
+            self.cluster_labels[cluster_id] = rebuilt_label
 
             print(
                 f"Cluster {cluster_id}"
@@ -542,7 +592,14 @@ class AIPipeline:
         )
 
         # Save for analytics modules
-        self.clustered_chunks = clustered_chunks
+        self.clustered_chunks = [
+            self._validate_clustered_chunk_metadata(
+                chunk,
+                self.cluster_labels.get(chunk["cluster"]),
+                self.subcluster_labels.get(chunk["cluster"], {}).get(chunk["subcluster"]),
+            )
+            for chunk in clustered_chunks
+        ]
 
         if len(filtered_embeddings) == 0:
             raise ValueError("No clustered chunks found after noise removal.")
@@ -557,14 +614,14 @@ class AIPipeline:
 
         self.vector_store.add(
             filtered_embeddings,
-            clustered_chunks
+            self.clustered_chunks
         )
 
         self.vector_store.save(
             VECTORSTORE_DIR
         )
 
-        self.clustered_chunks = clustered_chunks
+        self.clustered_chunks = self.clustered_chunks
 
         artifact_manager = ArtifactManager()
 
@@ -572,7 +629,7 @@ class AIPipeline:
 
             "artifacts/clustered_chunks.json",
 
-            clustered_chunks
+            self.clustered_chunks
 
         )
 
@@ -614,7 +671,8 @@ class AIPipeline:
         build_info = {
             "dataset_hash": dataset_hash,
             "embedding_model": EMBEDDING_MODEL,
-            "num_chunks": len(clustered_chunks)
+            "num_chunks": len(self.clustered_chunks),
+            "retrieval_quality_version": 2,
         }
 
         artifact_manager.save_json(
@@ -628,7 +686,7 @@ class AIPipeline:
 
         print(
             "Vector DB built with",
-            len(clustered_chunks),
+            len(self.clustered_chunks),
             "clean chunks"
         )
 
@@ -637,8 +695,9 @@ class AIPipeline:
     # ---------------------------------------------------
 
     def query(self, question):
-
-        query_embedding = self.embedding_service.embed([question])[0]
+        expanded_terms = self._expand_query(question)
+        expanded_query = " ".join([question] + expanded_terms)
+        query_embedding = self.embedding_service.embed([expanded_query])[0]
 
         # ---------------------------------------------------
         # GLOBAL SEARCH
@@ -706,24 +765,44 @@ class AIPipeline:
         # ---------------------------------------------------
 
         reranker = RetrievalReranker()
-
+        enriched_results = [
+            self._enrich_result_metadata(result)
+            for result in all_results
+        ]
         results = reranker.rerank(
-
-            all_results,
-
+            enriched_results,
+            query=question,
+            expanded_terms=expanded_terms,
             max_per_subcluster=2,
-
             top_k=FINAL_RERANK_K
-
         )
         # ---------------------------------------------
         # RETRIEVAL CONFIDENCE CHECK
         # ---------------------------------------------
-        scores = [r["score"] for r in results]
+        results = [
+            self._apply_confidence(result, top_clusters)
+            for result in results
+        ]
+        scores = [r["confidence_score"] for r in results]
+
+        if not scores:
+            return (
+                "Insufficient narrative evidence found in the current media corpus.",
+                {
+                    "question": question,
+                    "max_score": 0.0,
+                    "avg_score": 0.0,
+                    "min_score": 0.0,
+                },
+            )
 
         avg_score = sum(scores) / len(scores)
 
-        if avg_score >= 0.70:
+        if avg_score >= 0.85:
+
+            confidence_level = "Very High"
+
+        elif avg_score >= 0.70:
 
             confidence_level = "High"
 
@@ -752,7 +831,8 @@ class AIPipeline:
 
             "avg_score": avg_score,
 
-            "min_score": min(scores)
+            "min_score": min(scores),
+            "expanded_terms": expanded_terms,
         }
 
         if avg_score < MIN_CONFIDENCE:
@@ -819,8 +899,28 @@ class AIPipeline:
             )
 
             print(
+                f"📰 Source: "
+                f"{r.get('source', 'Unknown')}"
+            )
+
+            print(
+                f"📅 Date: "
+                f"{r.get('date', 'Unknown')}"
+            )
+
+            print(
                 f"📊 Confidence: "
-                f"{r['score']:.4f}"
+                f"{r['confidence_level']} ({r['confidence_score']:.4f})"
+            )
+
+            print(
+                f"🧩 Cluster: "
+                f"{cluster_id}"
+            )
+
+            print(
+                f"🧷 Subcluster: "
+                f"{subcluster_id}"
             )
 
             print(r["text"][:200])
@@ -1441,3 +1541,144 @@ class AIPipeline:
             print(response)
 
             print("\n" + "=" * 60 + "\n")
+
+    def _prepare_article_metadata(self, article: dict[str, Any]) -> dict[str, str]:
+        title = self._clean_metadata_value(article.get("title"))
+        source = self._clean_metadata_value(article.get("source"))
+        date = self._clean_metadata_value(article.get("formatted_date") or article.get("date"))
+        country = self._clean_metadata_value(article.get("country"))
+        language = self._clean_metadata_value(article.get("language")) or "English"
+        topic = self._clean_metadata_value(article.get("topic")) or title or source
+
+        return {
+            "title": title or "Untitled Article",
+            "source": source or "Unknown Source",
+            "date": date or "Unknown Date",
+            "country": country or "Unknown Country",
+            "language": language,
+            "topic": topic or "General Coverage",
+        }
+
+    def _validate_chunk_metadata(self, chunk: dict[str, Any]) -> dict[str, Any]:
+        validated = dict(chunk)
+        validated["title"] = self._clean_metadata_value(validated.get("title")) or "Untitled Article"
+        validated["source"] = self._clean_metadata_value(validated.get("source")) or "Unknown Source"
+        validated["date"] = self._clean_metadata_value(validated.get("date")) or "Unknown Date"
+        validated["country"] = self._clean_metadata_value(validated.get("country")) or "Unknown Country"
+        validated["language"] = self._clean_metadata_value(validated.get("language")) or "English"
+        validated["topic"] = (
+            self._clean_metadata_value(validated.get("topic"))
+            or validated["title"]
+            or validated["source"]
+            or "General Coverage"
+        )
+        return validated
+
+    def _validate_clustered_chunk_metadata(
+        self,
+        chunk: dict[str, Any],
+        cluster_label: str | None,
+        subcluster_label: str | None,
+    ) -> dict[str, Any]:
+        validated = self._validate_chunk_metadata(chunk)
+        validated["cluster"] = int(validated.get("cluster", -1))
+        validated["subcluster"] = int(validated.get("subcluster", 0))
+        validated["topic"] = (
+            self._clean_metadata_value(subcluster_label)
+            or self._clean_metadata_value(validated.get("topic"))
+            or self._clean_metadata_value(cluster_label)
+            or validated["title"]
+        )
+        return validated
+
+    def _clean_metadata_value(self, value: Any) -> str:
+        if value is None:
+            return ""
+        cleaned = str(value).strip()
+        if not cleaned or cleaned.lower() in {"unknown", "none", "null"}:
+            return ""
+        return cleaned
+
+    def _expand_query(self, question: str) -> list[str]:
+        lowered = question.lower()
+        expanded_terms: list[str] = []
+        for phrase, synonyms in self.query_synonyms.items():
+            if phrase in lowered:
+                expanded_terms.extend(synonyms)
+
+        tokens = {
+            token.lower()
+            for token in re.findall(r"[A-Za-z][A-Za-z'-]{1,}", question)
+        }
+        for token in tokens:
+            if token in self.query_synonyms:
+                expanded_terms.extend(self.query_synonyms[token])
+
+        deduped: list[str] = []
+        seen: set[str] = set()
+        for term in expanded_terms:
+            normalized = term.strip().lower()
+            if normalized and normalized not in seen:
+                seen.add(normalized)
+                deduped.append(term)
+        return deduped
+
+    def _enrich_result_metadata(self, result: dict[str, Any]) -> dict[str, Any]:
+        for item in getattr(self.vector_store, "texts", []):
+            if (
+                item.get("text") == result.get("text")
+                and item.get("cluster") == result.get("cluster")
+                and item.get("subcluster", 0) == result.get("subcluster", 0)
+            ):
+                enriched = dict(item)
+                enriched["score"] = result.get("score", 0.0)
+                enriched["topic"] = (
+                    self._clean_metadata_value(item.get("topic"))
+                    or self.subcluster_labels.get(result.get("cluster"), {}).get(result.get("subcluster", 0))
+                    or self.cluster_labels.get(result.get("cluster"))
+                    or item.get("title")
+                    or "General Coverage"
+                )
+                return self._validate_chunk_metadata(enriched)
+        return self._validate_chunk_metadata(result)
+
+    def _apply_confidence(
+        self,
+        result: dict[str, Any],
+        top_clusters: list[int],
+    ) -> dict[str, Any]:
+        metadata_fields = ("title", "source", "date", "country", "language", "topic")
+        metadata_consistency = sum(
+            1 for field in metadata_fields if self._clean_metadata_value(result.get(field))
+        ) / len(metadata_fields)
+
+        cluster_consistency = 0.0
+        if result.get("cluster") in top_clusters:
+            cluster_consistency += 0.7
+        if self._clean_metadata_value(result.get("topic")):
+            cluster_consistency += 0.3
+
+        confidence_score = (
+            (0.40 * float(result.get("vector_similarity", 0.0)))
+            + (0.25 * float(result.get("reranker_score", 0.0)))
+            + (0.20 * metadata_consistency)
+            + (0.15 * cluster_consistency)
+        )
+
+        if confidence_score >= 0.85:
+            confidence_level = "Very High"
+        elif confidence_score >= 0.70:
+            confidence_level = "High"
+        elif confidence_score >= 0.50:
+            confidence_level = "Medium"
+        else:
+            confidence_level = "Low"
+
+        enriched = dict(result)
+        enriched["confidence_score"] = confidence_score
+        enriched["confidence_level"] = confidence_level
+        return enriched
+
+
+if __name__ == "__main__":
+    AIPipeline().run()

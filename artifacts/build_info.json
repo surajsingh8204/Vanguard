@@ -1,0 +1,6 @@
+{
+    "dataset_hash": "90a33990288f82c713dbb7b815037229",
+    "embedding_model": "all-MiniLM-L6-v2",
+    "num_chunks": 733,
+    "retrieval_quality_version": 2
+}

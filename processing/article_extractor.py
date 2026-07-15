@@ -1,196 +1,186 @@
+from __future__ import annotations
+
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from time import sleep
+from dataclasses import dataclass
+from typing import Any
 
-import requests
 import trafilatura
 from bs4 import BeautifulSoup
 
-from config.settings import (
-    ARTICLE_FETCH_BACKOFF_SECONDS,
-    ARTICLE_FETCH_RETRIES,
-    ARTICLE_FETCH_TIMEOUT_SECONDS,
-)
+from config.settings import ARTICLE_EXTRACT_WORKERS
 
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass(slots=True)
+class ExtractionReport:
+    attempted: int = 0
+    extracted: int = 0
+    failed: int = 0
+    trafilatura_success: int = 0
+    beautifulsoup_success: int = 0
+
+
 class ArticleExtractor:
+    """Extract structured article content from raw HTML only."""
 
-    def __init__(self, max_workers=10, retries=ARTICLE_FETCH_RETRIES):
-
+    def __init__(self, max_workers: int = ARTICLE_EXTRACT_WORKERS) -> None:
         self.max_workers = max_workers
-        self.retries = retries
-        self.session = requests.Session()
-        self.session.headers.update(
-            {
-                "User-Agent": (
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/126.0 Safari/537.36"
-                )
-            }
-        )
+        self.report = ExtractionReport()
 
-    def _fetch_html(self, url):
+    def extract_batch(self, articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        self.report = ExtractionReport(attempted=len(articles))
+        if not articles:
+            self.print_report()
+            return []
 
-        last_error = None
-
-        for attempt in range(self.retries):
-
-            try:
-                response = self.session.get(
-                    url,
-                    timeout=ARTICLE_FETCH_TIMEOUT_SECONDS,
-                )
-                response.raise_for_status()
-                return response.text
-
-            except requests.RequestException as exc:
-                last_error = exc
-                logger.warning(
-                    "Fallback fetch failed for %s on attempt %s: %s",
-                    url,
-                    attempt + 1,
-                    exc,
-                )
-
-                if attempt < self.retries - 1:
-                    sleep(ARTICLE_FETCH_BACKOFF_SECONDS)
-
-        logger.error("Unable to fetch article HTML for %s", url, exc_info=last_error)
-        return None
-
-    def _extract_trafilatura(self, url):
-
-        try:
-            downloaded = trafilatura.fetch_url(url)
-
-            if not downloaded:
-                return None
-
-            text = trafilatura.extract(
-                downloaded,
-                include_comments=False,
-                include_tables=False,
-                favor_precision=True,
-            )
-
-            if text:
-                return self._normalize_text(text)
-
-        except (AttributeError, TypeError, ValueError, requests.RequestException) as exc:
-            logger.warning("Trafilatura extraction failed for %s: %s", url, exc)
-
-        return None
-
-    def _extract_beautifulsoup(self, url):
-
-        html = self._fetch_html(url)
-        if not html:
-            return None, None
-
-        try:
-            soup = BeautifulSoup(html, "html.parser")
-
-            for tag in soup(["script", "style", "noscript", "svg", "canvas", "header", "footer", "nav", "aside", "form"]):
-                tag.decompose()
-
-            title = None
-            if soup.title and soup.title.string:
-                title = self._normalize_text(soup.title.string)
-
-            container = soup.find("article") or soup.find("main") or soup.body or soup
-
-            paragraphs = [
-                self._normalize_text(paragraph.get_text(" ", strip=True))
-                for paragraph in container.find_all("p")
-            ]
-
-            if paragraphs:
-                text = " ".join(paragraph for paragraph in paragraphs if paragraph)
-            else:
-                text = self._normalize_text(container.get_text(" ", strip=True))
-
-            return text or None, title
-
-        except (AttributeError, TypeError, ValueError) as exc:
-            logger.warning("BeautifulSoup extraction failed for %s: %s", url, exc)
-            return None, None
-
-    def _normalize_text(self, text):
-
-        if not text:
-            return ""
-
-        return " ".join(text.split()).strip()
-
-    def _build_record(self, article, content, extraction_method, title=None):
-
-        record = {
-            "url": article.get("url"),
-            "title": title or article.get("title"),
-            "source": article.get("source"),
-            "formatted_date": article.get("formatted_date"),
-            "content": content,
-            "extraction_method": extraction_method,
-            "word_count": len(content.split()),
-        }
-
-        return record
-
-    def extract_article(self, article):
-
-        url = article.get("url")
-        if not url:
-            return None
-
-        text = self._extract_trafilatura(url)
-        if text:
-            return self._build_record(article, text, "trafilatura")
-
-        text, title = self._extract_beautifulsoup(url)
-        if text:
-            return self._build_record(article, text, "beautifulsoup", title=title)
-
-        return None
-
-    def _process_single(self, article):
-
-        try:
-            return self.extract_article(article)
-
-        except (requests.RequestException, UnicodeDecodeError, ValueError, TypeError) as exc:
-            logger.exception("Article extraction failed for %s", article.get("url"))
-            return None
-
-    def extract_batch(self, articles):
-
-        print(f"Extracting content using {self.max_workers} workers...")
-
-        results = [None] * len(articles)
+        results: list[dict[str, Any] | None] = [None] * len(articles)
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-
             futures = {
                 executor.submit(self._process_single, article): index
                 for index, article in enumerate(articles)
             }
 
             for future in as_completed(futures):
-
                 index = futures[future]
-
                 try:
                     results[index] = future.result()
-
-                except (requests.RequestException, UnicodeDecodeError, ValueError, TypeError) as exc:
-                    logger.exception("Extraction worker failed")
+                except (AttributeError, TypeError, ValueError):
+                    logger.exception("Article extraction worker failed")
                     results[index] = None
 
-        extracted = [result for result in results if result]
-
-        print("Extraction complete:", len(extracted))
-
+        extracted = [result for result in results if result is not None]
+        self.report.extracted = len(extracted)
+        self.report.failed = self.report.attempted - self.report.extracted
+        self.print_report()
         return extracted
+
+    def extract_article(self, article: dict[str, Any]) -> dict[str, Any] | None:
+        html = article.get("raw_html")
+        if not html:
+            return None
+
+        trafilatura_record = self._extract_with_trafilatura(article, html)
+        if trafilatura_record:
+            self.report.trafilatura_success += 1
+            return trafilatura_record
+
+        beautifulsoup_record = self._extract_with_beautifulsoup(article, html)
+        if beautifulsoup_record:
+            self.report.beautifulsoup_success += 1
+            return beautifulsoup_record
+
+        return None
+
+    def _process_single(self, article: dict[str, Any]) -> dict[str, Any] | None:
+        try:
+            return self.extract_article(article)
+        except (AttributeError, TypeError, ValueError):
+            logger.exception("Article extraction failed for %s", article.get("url"))
+            return None
+
+    def _extract_with_trafilatura(self, article: dict[str, Any], html: str) -> dict[str, Any] | None:
+        try:
+            content = trafilatura.extract(
+                html,
+                include_comments=False,
+                include_tables=False,
+                favor_precision=True,
+            )
+        except (AttributeError, TypeError, ValueError) as exc:
+            logger.warning("Trafilatura extraction failed for %s: %s", article.get("url"), exc)
+            return None
+
+        normalized_content = self._normalize_text(content)
+        if not normalized_content:
+            return None
+
+        title = article.get("title") or self._extract_title_from_html(html)
+        return self._build_record(article, normalized_content, "trafilatura", title)
+
+    def _extract_with_beautifulsoup(self, article: dict[str, Any], html: str) -> dict[str, Any] | None:
+        try:
+            soup = BeautifulSoup(html, "html.parser")
+        except (AttributeError, TypeError, ValueError) as exc:
+            logger.warning("BeautifulSoup parsing failed for %s: %s", article.get("url"), exc)
+            return None
+
+        for tag in soup(
+            ["script", "style", "noscript", "svg", "canvas", "header", "footer", "nav", "aside", "form"]
+        ):
+            tag.decompose()
+
+        container = soup.find("article") or soup.find("main") or soup.body or soup
+        paragraphs = [
+            self._normalize_text(paragraph.get_text(" ", strip=True))
+            for paragraph in container.find_all("p")
+        ]
+        content = " ".join(paragraph for paragraph in paragraphs if paragraph)
+        if not content:
+            content = self._normalize_text(container.get_text(" ", strip=True))
+        if not content:
+            return None
+
+        title = article.get("title") or self._extract_title_from_soup(soup)
+        return self._build_record(article, content, "beautifulsoup", title)
+
+    def _build_record(
+        self,
+        article: dict[str, Any],
+        content: str,
+        extraction_method: str,
+        title: str | None,
+    ) -> dict[str, Any]:
+        return {
+            "url": article.get("url"),
+            "title": title,
+            "source": article.get("source"),
+            "formatted_date": article.get("formatted_date"),
+            "content": content,
+            "word_count": len(content.split()),
+            "extraction_method": extraction_method,
+        }
+
+    def _extract_title_from_html(self, html: str) -> str | None:
+        try:
+            soup = BeautifulSoup(html, "html.parser")
+        except (AttributeError, TypeError, ValueError):
+            return None
+        return self._extract_title_from_soup(soup)
+
+    def _extract_title_from_soup(self, soup: BeautifulSoup) -> str | None:
+        if soup.title and soup.title.string:
+            return self._normalize_text(soup.title.string)
+
+        heading = soup.find("h1")
+        if heading:
+            return self._normalize_text(heading.get_text(" ", strip=True))
+
+        return None
+
+    def _normalize_text(self, text: Any) -> str:
+        if not text:
+            return ""
+        return " ".join(str(text).split()).strip()
+
+    def print_report(self) -> None:
+        print("========================================")
+        print()
+        print("EXTRACTION REPORT")
+        print()
+        print("========================================")
+        print()
+        print(f"Attempted: {self.report.attempted}")
+        print()
+        print(f"Extracted: {self.report.extracted}")
+        print()
+        print(f"Failed: {self.report.failed}")
+        print()
+        print(f"Trafilatura Success: {self.report.trafilatura_success}")
+        print()
+        print(f"BeautifulSoup Success: {self.report.beautifulsoup_success}")
+        print()
+        print("========================================")

@@ -88,17 +88,39 @@ RAW_FEEDS_DIR = "data_lake/raw_feeds"
 
 RAW_ARTICLES_DIR = "data_lake/raw"
 
+RAW_DIRECTORY = RAW_ARTICLES_DIR
+
+RAW_LOAD_MODE = "incremental"
+
+RAW_LAST_N = 3
+
 PROCESSED_DIR = "data_lake/processed"
 
 ENRICHED_ARTICLES_PATH = "data_lake/processed/enriched_articles.json"
 
 PROCESSED_FEEDS_FILE = "data_lake/processed_feeds.txt"
 
+BATCH_SIZE = 250
+
+MAX_ARTICLES_PER_RUN = 1000
+
+CHECKPOINT_FILE = "artifacts/etl_checkpoint.json"
+
 ARTICLE_FETCH_TIMEOUT_SECONDS = 10
 
 ARTICLE_FETCH_RETRIES = 3
 
 ARTICLE_FETCH_BACKOFF_SECONDS = 1
+
+ARTICLE_FETCH_WORKERS = 10
+
+ARTICLE_EXTRACT_WORKERS = 10
+
+ARTICLE_FETCH_USER_AGENTS = (
+	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
+	"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+)
 
 FEED_DOWNLOAD_TIMEOUT_SECONDS = 10
 

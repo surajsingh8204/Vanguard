@@ -1,153 +1,177 @@
+from __future__ import annotations
+
 import hashlib
-import re
+from dataclasses import dataclass
+from typing import Any
 
 from config.settings import (
+    CLOUDFLARE_PATTERNS,
     CSS_JS_HIT_THRESHOLD,
     CSS_JS_PATTERNS,
-    CLOUDFLARE_PATTERNS,
     HTML_TAG_RATIO_THRESHOLD,
     LANGUAGE_QUALITY_THRESHOLD,
+    LOW_INFORMATION_THRESHOLD,
     MIN_CHUNK_LENGTH,
     NAVIGATION_HIT_THRESHOLD,
     NAVIGATION_PATTERNS,
-    LOW_INFORMATION_THRESHOLD,
 )
 
 
+@dataclass(slots=True)
+class FirewallReport:
+    attempted: int = 0
+    accepted: int = 0
+    cloudflare: int = 0
+    html: int = 0
+    css_js: int = 0
+    navigation: int = 0
+    short: int = 0
+    duplicate: int = 0
+    low_information: int = 0
+    language_quality: int = 0
+
+
 class DataQualityFirewall:
+    """Validate article quality and reject low-value content."""
 
-    def __init__(self):
-        self.stats = {
-            "accepted": 0,
-            "cloudflare": 0,
-            "html": 0,
-            "css_js": 0,
-            "navigation": 0,
-            "short": 0,
-            "duplicate": 0,
-            "low_information": 0,
-            "language_quality": 0,
-        }
+    def __init__(self) -> None:
+        self.report = FirewallReport()
+        self._existing_hashes: set[str] = set()
 
-    def is_cloudflare(self, text):
+    def validate_batch(self, articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        self.report = FirewallReport(attempted=len(articles))
+        self._existing_hashes = set()
+        accepted_articles: list[dict[str, Any]] = []
+
+        for article in articles:
+            is_valid, _reason = self.validate(article)
+            if is_valid:
+                accepted_articles.append(article)
+
+        self.report.accepted = len(accepted_articles)
+        self.print_report()
+        return accepted_articles
+
+    def validate(
+        self,
+        article_or_text: dict[str, Any] | str,
+        existing_hashes: set[str] | None = None,
+    ) -> tuple[bool, str]:
+        text = self._extract_text(article_or_text)
+        hash_store = existing_hashes if existing_hashes is not None else self._existing_hashes
+
+        if self.is_cloudflare(text):
+            self.report.cloudflare += 1
+            return False, "cloudflare"
+
+        if self.is_html_heavy(text):
+            self.report.html += 1
+            return False, "html"
+
+        if self.is_css_or_js(text):
+            self.report.css_js += 1
+            return False, "css_js"
+
+        if self.is_navigation(text):
+            self.report.navigation += 1
+            return False, "navigation"
+
+        if self.is_too_short(text):
+            self.report.short += 1
+            return False, "short"
+
+        is_duplicate, text_hash = self.is_duplicate(text, hash_store)
+        if is_duplicate:
+            self.report.duplicate += 1
+            return False, "duplicate"
+
+        if self.is_low_information(text):
+            self.report.low_information += 1
+            return False, "low_information"
+
+        if self.is_language_quality(text):
+            self.report.language_quality += 1
+            return False, "language_quality"
+
+        hash_store.add(text_hash)
+        self.report.accepted += 1
+        return True, "valid"
+
+    def _extract_text(self, article_or_text: dict[str, Any] | str) -> str:
+        if isinstance(article_or_text, dict):
+            return str(article_or_text.get("content", ""))
+        return str(article_or_text)
+
+    def is_cloudflare(self, text: str) -> bool:
         lowered = text.lower()
         return any(pattern in lowered for pattern in CLOUDFLARE_PATTERNS)
 
-    def is_html_heavy(self, text):
+    def is_html_heavy(self, text: str) -> bool:
         words = text.split()
-        total_words = len(words)
-        if total_words == 0:
+        if not words:
             return True
 
-        html_markers = (
-            text.count("<")
-            + text.count(">")
-            + text.count("</")
-            + text.count("/>")
-        )
-        ratio = html_markers / total_words
-        return ratio > HTML_TAG_RATIO_THRESHOLD
+        html_markers = text.count("<") + text.count(">") + text.count("</") + text.count("/>")
+        return (html_markers / len(words)) > HTML_TAG_RATIO_THRESHOLD
 
-    def is_css_or_js(self, text):
+    def is_css_or_js(self, text: str) -> bool:
         lowered = text.lower()
         hits = sum(1 for pattern in CSS_JS_PATTERNS if pattern in lowered)
         return hits >= CSS_JS_HIT_THRESHOLD
 
-    def is_navigation(self, text):
+    def is_navigation(self, text: str) -> bool:
         lowered = text.lower()
         hits = sum(1 for pattern in NAVIGATION_PATTERNS if pattern in lowered)
         return hits >= NAVIGATION_HIT_THRESHOLD
 
-    def is_too_short(self, text):
-        word_count = len(text.split())
-        return word_count < MIN_CHUNK_LENGTH
+    def is_too_short(self, text: str) -> bool:
+        return len(text.split()) < MIN_CHUNK_LENGTH
 
-    def is_low_information(self, text):
+    def is_duplicate(self, text: str, existing_hashes: set[str] | None = None) -> tuple[bool, str]:
+        hash_store = existing_hashes if existing_hashes is not None else self._existing_hashes
+        text_hash = hashlib.md5(text.encode("utf-8")).hexdigest()
+        return text_hash in hash_store, text_hash
+
+    def is_low_information(self, text: str) -> bool:
         words = [word.strip().lower() for word in text.split() if word.strip()]
-        total_words = len(words)
-        if total_words == 0:
+        if not words:
             return True
 
-        unique_words = len(set(words))
-        ratio = unique_words / total_words
-        return ratio < LOW_INFORMATION_THRESHOLD
+        unique_ratio = len(set(words)) / len(words)
+        return unique_ratio < LOW_INFORMATION_THRESHOLD
 
-    def is_duplicate(self, text, existing_hashes):
-        text_hash = hashlib.md5(text.encode("utf-8")).hexdigest()
-        if text_hash in existing_hashes:
-            return True, text_hash
-        return False, text_hash
+    def is_language_quality(self, text: str) -> bool:
+        if not text:
+            return True
 
-    def is_language_quality(self, text):
-        total_characters = len(text)
-        if total_characters == 0:
-            return False
+        alphabetic_characters = sum(1 for character in text if character.isalpha())
+        return (alphabetic_characters / len(text)) < LANGUAGE_QUALITY_THRESHOLD
 
-        alphabetic_characters = sum(1 for char in text if char.isalpha())
-        ratio = alphabetic_characters / total_characters
-        return ratio < LANGUAGE_QUALITY_THRESHOLD
-
-    def validate(self, text, existing_hashes):
-        if self.is_cloudflare(text):
-            self.stats["cloudflare"] += 1
-            return False, "cloudflare"
-
-        if self.is_html_heavy(text):
-            self.stats["html"] += 1
-            return False, "html"
-
-        if self.is_css_or_js(text):
-            self.stats["css_js"] += 1
-            return False, "css_js"
-
-        if self.is_navigation(text):
-            self.stats["navigation"] += 1
-            return False, "navigation"
-
-        if self.is_too_short(text):
-            self.stats["short"] += 1
-            return False, "short"
-
-        is_duplicate, text_hash = self.is_duplicate(text, existing_hashes)
-        if is_duplicate:
-            self.stats["duplicate"] += 1
-            return False, "duplicate"
-
-        if self.is_low_information(text):
-            self.stats["low_information"] += 1
-            return False, "low_information"
-
-        if self.is_language_quality(text):
-            self.stats["language_quality"] += 1
-            return False, "language_quality"
-
-        existing_hashes.add(text_hash)
-        self.stats["accepted"] += 1
-        return True, "valid"
-
-    def print_report(self):
-        print("========================================")
-        print("DATA QUALITY REPORT")
+    def print_report(self) -> None:
         print("========================================")
         print()
-        print(f"Accepted: {self.stats['accepted']}")
+        print("FIREWALL REPORT")
         print()
-        print("Rejected")
+        print("========================================")
         print()
-        print(f"Cloudflare: {self.stats['cloudflare']}")
+        print(f"Attempted: {self.report.attempted}")
         print()
-        print(f"HTML: {self.stats['html']}")
+        print(f"Accepted: {self.report.accepted}")
         print()
-        print(f"CSS/JS: {self.stats['css_js']}")
+        print(f"Cloudflare: {self.report.cloudflare}")
         print()
-        print(f"Navigation: {self.stats['navigation']}")
+        print(f"HTML: {self.report.html}")
         print()
-        print(f"Duplicate: {self.stats['duplicate']}")
+        print(f"CSS/JS: {self.report.css_js}")
         print()
-        print(f"Short: {self.stats['short']}")
+        print(f"Navigation: {self.report.navigation}")
         print()
-        print(f"Low Information: {self.stats['low_information']}")
+        print(f"Short: {self.report.short}")
         print()
-        print(f"Language Quality: {self.stats['language_quality']}")
+        print(f"Duplicate: {self.report.duplicate}")
+        print()
+        print(f"Low Information: {self.report.low_information}")
+        print()
+        print(f"Language Quality: {self.report.language_quality}")
         print()
         print("========================================")

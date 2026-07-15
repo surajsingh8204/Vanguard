@@ -1,0 +1,224 @@
+[
+    {
+        "cluster": 0,
+        "label": "Expert Dermatologist Care Guidance",
+        "volume": 12,
+        "subclusters": [
+            "Expert Dermatologist Care and Guidance"
+        ]
+    },
+    {
+        "cluster": 1,
+        "label": "Naruto's Hidden Ultimate Power Unleashed",
+        "volume": 16,
+        "subclusters": [
+            "Naruto's Ultimate Power Unleashed"
+        ]
+    },
+    {
+        "cluster": 2,
+        "label": "Natural CBD Edible Relief Solution",
+        "volume": 13,
+        "subclusters": [
+            "CBD edibles provide consistent relief."
+        ]
+    },
+    {
+        "cluster": 3,
+        "label": "Personalized Gaming PC Setup",
+        "volume": 27,
+        "subclusters": [
+            "Customizable DIY Gaming PC Setup"
+        ]
+    },
+    {
+        "cluster": 4,
+        "label": "Island Nations Celebrate Cultural Diversity",
+        "volume": 12,
+        "subclusters": [
+            "Island Nations and Cultural Diversity"
+        ]
+    },
+    {
+        "cluster": 5,
+        "label": "Country Music Empowers Strong Female Voices",
+        "volume": 49,
+        "subclusters": [
+            "Country Music Endures Through Time",
+            "Female Empowerment at Coachella Festival",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 6,
+        "label": "Tamera Housley's Online Reputation Crisis",
+        "volume": 14,
+        "subclusters": [
+            "Tamera Housley's Online Reputation Crisis"
+        ]
+    },
+    {
+        "cluster": 7,
+        "label": "Savoring Earthy Mushroom Flavors",
+        "volume": 26,
+        "subclusters": [
+            "Mushroom flavors in savory culinary dishes."
+        ]
+    },
+    {
+        "cluster": 8,
+        "label": "Texas Urban Farm Celebration",
+        "volume": 20,
+        "subclusters": [
+            "Texas Premier Urban Farm Celebration"
+        ]
+    },
+    {
+        "cluster": 9,
+        "label": "A mother's unwavering love defies expectations.",
+        "volume": 53,
+        "subclusters": [
+            "A daughter's unwavering care for her mother.",
+            "Navigating Parenthood as Transgender Teens",
+            "Toronto's Female Professor Salary Discrepancy",
+            "Unknown",
+            "Youth Rebellion Against Generational Expectations"
+        ]
+    },
+    {
+        "cluster": 10,
+        "label": "Teenage girl vanishes in rural Maine.",
+        "volume": 25,
+        "subclusters": [
+            "Stefanie's Mysterious Disappearance in Rural Maine",
+            "Teenager's Taser-Resisted Arrest After Stabbing.",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 11,
+        "label": "Stevenson Street Revitalization Efforts Gain Funding.",
+        "volume": 13,
+        "subclusters": [
+            "Revitalizing Stevenson Street through Relief Funding."
+        ]
+    },
+    {
+        "cluster": 12,
+        "label": "Building Trust Through Ghanaian Infrastructure",
+        "volume": 24,
+        "subclusters": [
+            "Ghana's business leader builds trust.",
+            "Nigeria's Education Infrastructure Development Project",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 13,
+        "label": "Trump's Humiliating Stock Market Blunder",
+        "volume": 12,
+        "subclusters": [
+            "Trump's Embarrassing Laughing Stock Moment"
+        ]
+    },
+    {
+        "cluster": 14,
+        "label": "Gerrymandering Favors Republican Party Gains",
+        "volume": 23,
+        "subclusters": [
+            "Redistricting Favors Republican Party Gains"
+        ]
+    },
+    {
+        "cluster": 15,
+        "label": "A Freeman's Pitch for Success",
+        "volume": 26,
+        "subclusters": [
+            "Freeman's Success Affects Pitching Strategy"
+        ]
+    },
+    {
+        "cluster": 16,
+        "label": "Youthful Brazilian Defense Rises",
+        "volume": 98,
+        "subclusters": [
+            "Brazilian Youth Shines in Summer Football.",
+            "Jaguars Seek Defensive Lineup Improvement",
+            "Middlesbrough's Rise to Prominence",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 17,
+        "label": "Online Education Evolves During Pandemic",
+        "volume": 12,
+        "subclusters": [
+            "Auburn Educators Advance Alabama Literacy.",
+            "California's Online Education Shifts Amid Pandemic",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 18,
+        "label": "Serenity in the Face of Global Threats",
+        "volume": 16,
+        "subclusters": [
+            "Sri Lanka Fights Global Cyber Threats",
+            "Sri Lanka's Gentle Awakening to Serenity",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 19,
+        "label": "Global Brands Unite for Efficient Logistics.",
+        "volume": 21,
+        "subclusters": [
+            "\"Smart Brands Optimize Content Creation\"",
+            "Global Logistics Enterprises Unite Worldwide",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 20,
+        "label": "Rising Tech Investment Opportunities",
+        "volume": 13,
+        "subclusters": [
+            "Emerging Tech Stocks with High Potential."
+        ]
+    },
+    {
+        "cluster": 21,
+        "label": "Electric vehicles gain rapid market dominance.",
+        "volume": 18,
+        "subclusters": [
+            "Electric vehicle adoption accelerates rapidly.",
+            "Toyota Hybrid Loses Market Share",
+            "Unknown"
+        ]
+    },
+    {
+        "cluster": 22,
+        "label": "Global Tensions Rise Amid Hidden Scandal",
+        "volume": 163,
+        "subclusters": [
+            "Cuba's Hidden Secrets Exposed",
+            "Cuba's Leader Faces Financial Scandal",
+            "Global Politics Meet Local Interests",
+            "Middle East Tensions Escalate in June",
+            "Nvidia's Groundbreaking AI Technology Surge",
+            "Tensions Rise Over Iran Conflict",
+            "Unknown",
+            "Unprecedented Stock Market Shift in North America"
+        ]
+    },
+    {
+        "cluster": 23,
+        "label": "Rabada pressures Kohli in batting struggles.",
+        "volume": 27,
+        "subclusters": [
+            "KKR's batting struggles under Rabada's pressure.",
+            "Unknown",
+            "Virat Kohli leads RCB to victory."
+        ]
+    }
+]
