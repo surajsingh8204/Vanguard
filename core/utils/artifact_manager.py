@@ -158,13 +158,15 @@ class ArtifactManager:
 
     def analytics_exist(self):
 
+        from core.config.settings import ANALYTICS_DIR
+
         files = [
-            "artifacts/analytics/timeline.json",
-            "artifacts/analytics/forecasts.json",
-            "artifacts/analytics/early_warnings.json",
-            "artifacts/analytics/influence_scores.json",
-            "artifacts/analytics/executive_brief.json",
-            "artifacts/analytics/strategic_context.json"
+            f"{ANALYTICS_DIR}/timeline.json",
+            f"{ANALYTICS_DIR}/forecasts.json",
+            f"{ANALYTICS_DIR}/early_warnings.json",
+            f"{ANALYTICS_DIR}/influence_scores.json",
+            f"{ANALYTICS_DIR}/executive_brief.json",
+            f"{ANALYTICS_DIR}/strategic_context.json"
         ]
 
         return all(

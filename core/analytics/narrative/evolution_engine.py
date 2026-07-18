@@ -2,6 +2,8 @@ from collections import defaultdict
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
+from core.utils.time_utils import TimeUtils
+
 
 class EvolutionEngine:
 
@@ -35,7 +37,12 @@ class EvolutionEngine:
                 f"Cluster {cluster}"
             )
 
-            date = chunk["date"][:8]
+            date = TimeUtils.parse_to_day(
+                chunk.get("date")
+            )
+
+            if date is None:
+                continue
 
             temporal[label][date].append(chunk)
 

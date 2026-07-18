@@ -1,5 +1,6 @@
 from collections import defaultdict
-from datetime import datetime
+
+from core.utils.time_utils import TimeUtils
 
 
 class TimelineEngine:
@@ -14,6 +15,8 @@ class TimelineEngine:
 
     def build(self, chunks, cluster_labels):
 
+        counts = defaultdict(lambda: defaultdict(int))
+
         for chunk in chunks:
 
             cluster = chunk["cluster"]
@@ -23,23 +26,21 @@ class TimelineEngine:
                 f"Cluster {cluster}"
             )
 
-            raw_date = chunk.get("date")
+            day = TimeUtils.parse_to_day(
+                chunk.get("date")
+            )
 
-            try:
-
-                # GDELT format: YYYYMMDDHHMMSS
-                dt = datetime.strptime(
-                    raw_date,
-                    "%Y%m%d%H%M%S"
-                )
-
-                day = dt.strftime("%Y-%m-%d")
-
-            except:
-
+            if day is None:
                 continue
 
-            self.timeline[label][day] += 1
+            counts[label][day] += 1
+
+        # Downstream engines (spikes, forecasts, evaluation) read
+        # day counts in insertion order, so keep days chronological.
+        self.timeline = {
+            label: dict(sorted(days.items()))
+            for label, days in counts.items()
+        }
 
         return self.timeline
 

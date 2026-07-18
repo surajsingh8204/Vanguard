@@ -83,15 +83,7 @@ class AIPipeline:
         self.influence_scores = None
         self.executive_brief = None
         self.strategic_context = None
-        self.query_synonyms = {
-            "fifa world cup": ["football", "soccer", "world cup", "fifa", "international football"],
-            "ukraine": ["kyiv", "russia", "ukrainian", "moscow"],
-            "nato": ["alliance", "atlantic alliance", "member states"],
-            "tariffs": ["trade barriers", "import duties", "trade policy"],
-            "sanctions": ["penalties", "economic restrictions", "blacklist"],
-            "ceasefire": ["truce", "peace talks", "negotiation"],
-        }
-
+        
     # ---------------------------------------------------
     # TEXT CHUNKING
     # ---------------------------------------------------
@@ -684,9 +676,8 @@ class AIPipeline:
     # ---------------------------------------------------
 
     def query(self, question):
-        expanded_terms = self._expand_query(question)
-        expanded_query = " ".join([question] + expanded_terms)
-        query_embedding = self.embedding_service.embed([expanded_query])[0]
+        self.query_embedding = self.embedding_service.embed([question])[0]
+        query_embedding = self.embedding_service.embed([question])[0]
 
         # ---------------------------------------------------
         # GLOBAL SEARCH
@@ -761,7 +752,6 @@ class AIPipeline:
         results = reranker.rerank(
             enriched_results,
             query=question,
-            expanded_terms=expanded_terms,
             max_per_subcluster=2,
             top_k=FINAL_RERANK_K
         )
@@ -821,7 +811,6 @@ class AIPipeline:
             "avg_score": avg_score,
 
             "min_score": min(scores),
-            "expanded_terms": expanded_terms,
         }
 
         if avg_score < MIN_CONFIDENCE:
@@ -945,8 +934,20 @@ class AIPipeline:
     # ---------------------------------------------------
 
     def run_analytics(self, force_rebuild=False):
+        from datetime import datetime
+
         artifact_manager = ArtifactManager()
-        logger = EvaluationLogger()
+        evaluation_logger = EvaluationLogger()
+
+        def save_artifact(relative_path, payload):
+            try:
+                artifact_manager.save_json(
+                    f"{ARTIFACT_DIR}/{relative_path}",
+                    payload
+                )
+                logger.info("Saved %s", relative_path)
+            except Exception:
+                logger.exception("Failed to save %s", relative_path)
 
         if not force_rebuild and artifact_manager.analytics_exist():
 
@@ -977,6 +978,13 @@ class AIPipeline:
             print("✅ Using cached analytics.")
             return
 
+        save_artifact("narrative/clusters.json", self.cluster_groups)
+        save_artifact("narrative/cluster_labels.json", self.cluster_labels)
+        save_artifact(
+            "narrative/subcluster_labels.json",
+            self.subcluster_labels
+        )
+
         timeline_engine = TimelineEngine()
         timeline_engine.build(
             self.clustered_chunks,
@@ -985,6 +993,7 @@ class AIPipeline:
         timeline_engine.display()
 
         self.timeline = timeline_engine.timeline
+        save_artifact("narrative/timeline.json", timeline_engine.timeline)
 
         # ---------------------------------------------------
         # SPIKE DETECTION
@@ -997,8 +1006,9 @@ class AIPipeline:
         )
 
         spike_detector.display(spikes)
+        save_artifact("narrative/spikes.json", spikes)
 
-        logger.save(
+        evaluation_logger.save(
             "spike_report",
             spikes
         )
@@ -1014,7 +1024,8 @@ class AIPipeline:
         emerging_detector.display(
             emerging_narratives
         )
-        logger.save(
+        save_artifact("narrative/emerging.json", emerging_narratives)
+        evaluation_logger.save(
             "emerging_narratives",
             emerging_narratives
         )
@@ -1031,8 +1042,9 @@ class AIPipeline:
             temporal_clusters
         )
         evolution_engine.display(evolution_report)
+        save_artifact("narrative/evolution.json", evolution_report)
 
-        logger.save(
+        evaluation_logger.save(
             "evolution_report",
             evolution_report
         )
@@ -1062,30 +1074,30 @@ class AIPipeline:
             self.cluster_labels
         )
 
-        logger.save(
+        save_artifact("evaluation/coherence.json", coherence)
+        save_artifact("evaluation/purity.json", purity)
+
+        evaluation_logger.save(
             "coherence_scores",
             coherence
         )
 
-        logger.save(
+        evaluation_logger.save(
             "purity_scores",
             purity
         )
 
-        logger.save(
+        evaluation_logger.save(
             "cluster_labels",
             self.cluster_labels
         )
 
-        logger.save(
+        evaluation_logger.save(
             "timeline_report",
             timeline_engine.timeline
         )
 
-        artifact_manager.save_json(
-            f"{ANALYTICS_DIR}/timeline.json",
-            timeline_engine.timeline
-        )
+        save_artifact("analytics/timeline.json", timeline_engine.timeline)
 
         print("✅ Timeline saved.")
 
@@ -1113,7 +1125,9 @@ class AIPipeline:
             audit_report
         )
 
-        logger.save(
+        save_artifact("evaluation/label_audit.json", audit_report)
+
+        evaluation_logger.save(
             "label_audit",
             audit_report
         )
@@ -1131,6 +1145,35 @@ class AIPipeline:
             self.cluster_labels
         )
 
+        save_artifact(
+            "graphs/graph_summary.json",
+            {
+                "node_count": graph.number_of_nodes(),
+                "edge_count": graph.number_of_edges(),
+            }
+        )
+        save_artifact(
+            "graphs/nodes.json",
+            [
+                {
+                    "id": node,
+                    **dict(attributes)
+                }
+                for node, attributes in graph.nodes(data=True)
+            ]
+        )
+        save_artifact(
+            "graphs/edges.json",
+            [
+                {
+                    "source": source,
+                    "target": target,
+                    **dict(attributes)
+                }
+                for source, target, attributes in graph.edges(data=True)
+            ]
+        )
+
         graph_engine.display_summary()
 
         community_detector = CommunityDetector()
@@ -1138,6 +1181,7 @@ class AIPipeline:
         communities = community_detector.detect(
             graph
         )
+        save_artifact("graphs/communities.json", communities)
 
         community_detector.display(
             communities,
@@ -1149,6 +1193,7 @@ class AIPipeline:
         centrality_results = centrality.analyze(
             graph
         )
+        save_artifact("graphs/centrality.json", centrality_results)
 
         centrality.display(
             graph,
@@ -1160,6 +1205,13 @@ class AIPipeline:
         narrative_stats = stats_engine.generate(
             self.clustered_chunks,
             self.cluster_labels
+        )
+        save_artifact("narrative/statistics.json", narrative_stats)
+        save_artifact(
+            "narrative/sentiment.json",
+            {
+                "status": "not_computed"
+            }
         )
 
         stats_engine.display(
@@ -1177,6 +1229,7 @@ class AIPipeline:
                 centrality_results
             )
         )
+        save_artifact("graphs/influencers.json", influence_scores)
 
         influence_engine.display(
             influence_scores
@@ -1184,10 +1237,7 @@ class AIPipeline:
 
         self.influence_scores = influence_scores
 
-        artifact_manager.save_json(
-            f"{ANALYTICS_DIR}/influence_scores.json",
-            influence_scores
-        )
+        save_artifact("analytics/influence_scores.json", influence_scores)
 
         print("✅ Influence scores saved.")
 
@@ -1201,6 +1251,7 @@ class AIPipeline:
         mapper.display(
             mappings
         )
+        save_artifact("graphs/influence_mappings.json", mappings)
 
         diagnostics_engine = GraphDiagnostics()
 
@@ -1212,7 +1263,8 @@ class AIPipeline:
         )
 
         diagnostics_engine.display(diagnostics)
-        logger.save(
+        save_artifact("graphs/graph_diagnostics.json", diagnostics)
+        evaluation_logger.save(
             "graph_diagnostics",
             diagnostics
         )
@@ -1236,18 +1288,16 @@ class AIPipeline:
         forecast_engine.display(
             forecasts
         )
+        save_artifact("narrative/forecasts.json", forecasts)
 
-        logger.save(
+        evaluation_logger.save(
             "forecast_report",
             forecasts
         )
 
         self.forecasts = forecasts
 
-        artifact_manager.save_json(
-            f"{ANALYTICS_DIR}/forecasts.json",
-            forecasts
-        )
+        save_artifact("analytics/forecasts.json", forecasts)
 
         print("✅ Forecasts saved.")
 
@@ -1286,7 +1336,12 @@ class AIPipeline:
             evaluation_results
         )
 
-        logger.save(
+        save_artifact(
+            "evaluation/forecast_evaluation.json",
+            evaluation_results
+        )
+
+        evaluation_logger.save(
 
             "forecast_evaluation",
 
@@ -1310,14 +1365,12 @@ class AIPipeline:
 
         self.early_warnings = warnings
 
-        artifact_manager.save_json(
-            f"{ANALYTICS_DIR}/early_warnings.json",
-            warnings
-        )
+        save_artifact("narrative/early_warnings.json", warnings)
+        save_artifact("analytics/early_warnings.json", warnings)
 
         print("✅ Early warnings saved.")
 
-        logger.save(
+        evaluation_logger.save(
             "early_warning_report",
             warnings
         )
@@ -1350,7 +1403,9 @@ class AIPipeline:
             briefs
         )
 
-        logger.save(
+        save_artifact("metadata/intelligence_briefs.json", briefs)
+
+        evaluation_logger.save(
             "intelligence_briefs",
             briefs
         )
@@ -1376,6 +1431,8 @@ class AIPipeline:
         impact_analyzer.display(
             impact_reports
         )
+
+        save_artifact("metadata/impact_reports.json", impact_reports)
 
         # ---------------------------------------------------
         # EXECUTIVE BRIEF
@@ -1407,7 +1464,9 @@ class AIPipeline:
             executive_brief
         )
 
-        logger.save(
+        save_artifact("metadata/executive_brief.json", executive_brief)
+
+        evaluation_logger.save(
 
             "executive_brief",
 
@@ -1417,10 +1476,7 @@ class AIPipeline:
 
         self.executive_brief = executive_brief
 
-        artifact_manager.save_json(
-            f"{ANALYTICS_DIR}/executive_brief.json",
-            executive_brief
-        )
+        save_artifact("analytics/executive_brief.json", executive_brief)
 
         self.strategic_context = (
 
@@ -1439,10 +1495,8 @@ class AIPipeline:
 
         )
 
-        artifact_manager.save_json(
-            f"{ANALYTICS_DIR}/strategic_context.json",
-            self.strategic_context
-        )
+        save_artifact("metadata/strategic_context.json", self.strategic_context)
+        save_artifact("analytics/strategic_context.json", self.strategic_context)
 
         # ---------------------------------------------------
         # CORRELATION EVALUATION
@@ -1473,7 +1527,9 @@ class AIPipeline:
             corr_results
         )
 
-        logger.save(
+        save_artifact("evaluation/correlation.json", corr_results)
+
+        evaluation_logger.save(
 
             "correlation_evaluation",
 
@@ -1495,10 +1551,28 @@ class AIPipeline:
         )
 
         diagnostics_engine.display(diagnostics)
-        logger.save(
+        save_artifact("graphs/graph_diagnostics.json", diagnostics)
+        evaluation_logger.save(
             "graph_diagnostics",
             diagnostics
         )
+
+        pipeline_status = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "documents_processed": len(getattr(self, "clustered_chunks", [])),
+            "cluster_count": len(getattr(self, "cluster_groups", {})),
+            "subcluster_count": sum(
+                len(subclusters)
+                for subclusters in getattr(self, "subcluster_labels", {}).values()
+            ),
+            "embedding_model": EMBEDDING_MODEL,
+            "vector_index_size": len(getattr(self.vector_store, "texts", []))
+            if self.vector_store is not None else 0,
+            "pipeline_version": "2",
+            "status": "completed"
+        }
+
+        save_artifact("metadata/pipeline_status.json", pipeline_status)
     
     def initialize(self):
         print("Loading processed data...")
@@ -1590,30 +1664,6 @@ class AIPipeline:
         if not cleaned or cleaned.lower() in {"unknown", "none", "null"}:
             return ""
         return cleaned
-
-    def _expand_query(self, question: str) -> list[str]:
-        lowered = question.lower()
-        expanded_terms: list[str] = []
-        for phrase, synonyms in self.query_synonyms.items():
-            if phrase in lowered:
-                expanded_terms.extend(synonyms)
-
-        tokens = {
-            token.lower()
-            for token in re.findall(r"[A-Za-z][A-Za-z'-]{1,}", question)
-        }
-        for token in tokens:
-            if token in self.query_synonyms:
-                expanded_terms.extend(self.query_synonyms[token])
-
-        deduped: list[str] = []
-        seen: set[str] = set()
-        for term in expanded_terms:
-            normalized = term.strip().lower()
-            if normalized and normalized not in seen:
-                seen.add(normalized)
-                deduped.append(term)
-        return deduped
 
     def _enrich_result_metadata(self, result: dict[str, Any]) -> dict[str, Any]:
         for item in getattr(self.vector_store, "texts", []):

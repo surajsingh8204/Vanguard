@@ -1,6 +1,28 @@
 import numpy as np
 
 
+def _safe_correlation(scores, truth):
+    """Pearson correlation that returns None instead of NaN.
+
+    np.corrcoef yields NaN for fewer than 2 points or zero-variance
+    inputs; None keeps the JSON artifacts valid and lets the frontend
+    show an explicit empty state.
+    """
+
+    if len(scores) < 2:
+        return None
+
+    if np.std(scores) == 0 or np.std(truth) == 0:
+        return None
+
+    corr = np.corrcoef(scores, truth)[0, 1]
+
+    if not np.isfinite(corr):
+        return None
+
+    return round(float(corr), 4)
+
+
 class CorrelationEvaluator:
 
     # ---------------------------------------------------
@@ -66,13 +88,10 @@ class CorrelationEvaluator:
                 actual_growth[narrative]
             )
 
-        baseline_corr = np.corrcoef(
-
+        baseline_corr = _safe_correlation(
             baseline_scores,
-
             baseline_truth
-
-        )[0, 1]
+        )
 
         # ---------------------------------------------
         # VANGUARD CORRELATION
@@ -96,29 +115,20 @@ class CorrelationEvaluator:
                 actual_growth[narrative]
             )
 
-        vanguard_corr = np.corrcoef(
-
+        vanguard_corr = _safe_correlation(
             vanguard_scores,
-
             vanguard_truth
-
-        )[0, 1]
+        )
 
         return {
 
-            "baseline_correlation":
+            "baseline_correlation": baseline_corr,
 
-                round(
-                    float(baseline_corr),
-                    4
-                ),
+            "vanguard_correlation": vanguard_corr,
 
-            "vanguard_correlation":
+            "baseline_samples": len(baseline_scores),
 
-                round(
-                    float(vanguard_corr),
-                    4
-                )
+            "vanguard_samples": len(vanguard_scores),
         }
 
     # ---------------------------------------------------
@@ -138,47 +148,29 @@ class CorrelationEvaluator:
 
         print("=" * 60)
 
+        baseline = results["baseline_correlation"]
+        vanguard = results["vanguard_correlation"]
+
         print(
             f"\nBaseline Correlation: "
-            f"{results['baseline_correlation']}"
+            f"{'N/A' if baseline is None else baseline}"
         )
 
         print(
             f"Vanguard Correlation: "
-            f"{results['vanguard_correlation']}"
+            f"{'N/A' if vanguard is None else vanguard}"
         )
 
-        if (
+        baseline_value = baseline if baseline is not None else 0.0
+        vanguard_value = vanguard if vanguard is not None else 0.0
 
-            results[
-                "vanguard_correlation"
-            ]
-
-            >
-
-            results[
-                "baseline_correlation"
-            ]
-
-        ):
+        if vanguard_value > baseline_value:
 
             print(
                 "\n✅ Vanguard Outperforms Baseline"
             )
 
-        elif (
-
-            results[
-                "vanguard_correlation"
-            ]
-
-            <
-
-            results[
-                "baseline_correlation"
-            ]
-
-        ):
+        elif vanguard_value < baseline_value:
 
             print(
                 "\n⚠ Baseline Outperforms Vanguard"
