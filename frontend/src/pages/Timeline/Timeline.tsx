@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import ReactECharts from 'echarts-for-react'
 import { CalendarClock, Flame, TrendingUp } from 'lucide-react'
 import mediaStream from '@/assets/media-stream.png'
 import { getTimeline } from '@/api/timeline'
@@ -17,14 +18,38 @@ import { cn, formatNumber, truncate } from '@/lib/utils'
 function prettyDate(raw: string) {
   const cleaned = raw.replace(/-+$/, '').trim()
   if (!cleaned || cleaned.toLowerCase().startsWith('unknown')) return 'Undated'
+
+  if (cleaned.includes('T')) {
+    const date = new Date(cleaned)
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    }
+  }
+
   const parts = cleaned.split('-')
+  if (parts.length >= 3) {
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]))
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    }
+  }
+
   if (parts.length >= 2) {
-    const [year, month] = parts
-    const date = new Date(Number(year), Number(month) - 1)
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1)
     if (!Number.isNaN(date.getTime())) {
       return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     }
   }
+
   return cleaned
 }
 
@@ -41,6 +66,22 @@ export function Timeline() {
     queryFn: getNarrativeSummary,
   })
 
+  const volumeEntries = useMemo(() => {
+    const timeline = timelineQuery.data?.timeline ?? {}
+    const q = filter.trim().toLowerCase()
+    return Object.entries(timeline)
+      .filter(([label]) => !q || label.toLowerCase().includes(q))
+      .map(([label, days]) => {
+        const points = Object.entries(days)
+          .map(([date, count]) => ({ date, count: Number(count) || 0 }))
+          .sort((a, b) => a.date.localeCompare(b.date))
+        const total = points.reduce((sum, item) => sum + item.count, 0)
+        return { label, points, total }
+      })
+      .filter((item) => item.points.length > 0)
+      .sort((a, b) => b.total - a.total)
+  }, [timelineQuery.data, filter])
+
   const evolutionEntries = useMemo(() => {
     const evolution = timelineQuery.data?.evolution ?? {}
     const q = filter.trim().toLowerCase()
@@ -53,10 +94,55 @@ export function Timeline() {
       .sort((a, b) => b.events.length - a.events.length)
   }, [timelineQuery.data, filter])
 
+  const chartOption = useMemo(() => {
+    const top = volumeEntries.slice(0, 8)
+    const allBuckets = Array.from(
+      new Set(top.flatMap((item) => item.points.map((point) => point.date))),
+    ).sort()
+
+    return {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: '#111a2c',
+        borderColor: '#243149',
+        textStyle: { color: '#e8eef7', fontSize: 12 },
+      },
+      legend: {
+        type: 'scroll',
+        top: 0,
+        textStyle: { color: '#8b9bb4', fontSize: 11 },
+      },
+      grid: { left: 8, right: 16, top: 40, bottom: 8, containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: allBuckets.map(prettyDate),
+        axisLabel: { color: '#5a6a84', fontSize: 10 },
+        axisLine: { lineStyle: { color: '#243149' } },
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { color: '#5a6a84', fontSize: 10 },
+        splitLine: { lineStyle: { color: '#182338' } },
+      },
+      series: top.map((item) => {
+        const lookup = Object.fromEntries(item.points.map((point) => [point.date, point.count]))
+        return {
+          name: truncate(item.label, 28),
+          type: 'line',
+          smooth: true,
+          showSymbol: allBuckets.length <= 12,
+          data: allBuckets.map((bucket) => lookup[bucket] ?? 0),
+        }
+      }),
+    }
+  }, [volumeEntries])
+
   const totalEvents = useMemo(
     () => evolutionEntries.reduce((sum, item) => sum + item.events.length, 0),
     [evolutionEntries],
   )
+  const bucketCount = volumeEntries[0]?.points.length ?? 0
 
   if (timelineQuery.isLoading || narrativeQuery.isLoading) {
     return (
@@ -82,12 +168,17 @@ export function Timeline() {
         title="Timeline"
         description="How narratives evolved over time, with spikes, forecasts, and early warnings."
         image={mediaStream}
+        action={
+          <Badge tone="info">
+            {bucketCount} temporal {bucketCount === 1 ? 'bucket' : 'buckets'}
+          </Badge>
+        }
       />
 
       <div className="grid gap-5 sm:grid-cols-3">
         <StatCard
           label="Narratives tracked"
-          value={formatNumber(evolutionEntries.length)}
+          value={formatNumber(volumeEntries.length || evolutionEntries.length)}
           hint={`${formatNumber(totalEvents)} evolution snapshots`}
           icon={CalendarClock}
           tone="blue"
@@ -111,8 +202,8 @@ export function Timeline() {
       </div>
 
       <Panel
-        title="Narrative evolution"
-        subtitle="Monthly snapshots of how each narrative developed"
+        title="Narrative activity"
+        subtitle="Volume over time for the largest narratives"
         action={
           <Input
             className="h-9 w-64 rounded-lg"
@@ -121,6 +212,20 @@ export function Timeline() {
             onChange={(e) => setFilter(e.target.value)}
           />
         }
+      >
+        {volumeEntries.length ? (
+          <ReactECharts option={chartOption} style={{ height: 360 }} notMerge />
+        ) : (
+          <EmptyState
+            title="No timeline volume data"
+            description="Populated from analytics/timeline.json after a pipeline run."
+          />
+        )}
+      </Panel>
+
+      <Panel
+        title="Narrative evolution"
+        subtitle="Snapshots of how each narrative developed across temporal buckets"
       >
         {evolutionEntries.length ? (
           <div className="space-y-4">
@@ -162,7 +267,7 @@ export function Timeline() {
                               {prettyDate(event.date)}
                             </p>
                             <p className="mt-1.5 text-sm leading-7 text-ink-muted">
-                              {event.summary}…
+                              {event.summary}
                             </p>
                           </li>
                         ))}
@@ -176,7 +281,7 @@ export function Timeline() {
         ) : (
           <EmptyState
             title="No evolution data"
-            description="Populated from narrative/evolution.json after a pipeline run."
+            description="Evolution appears after analytics rebuild. Single-day corpora now use hourly buckets automatically."
           />
         )}
       </Panel>
@@ -198,11 +303,11 @@ export function Timeline() {
                       {truncate(item.narrative, 90)}
                     </p>
                     <span className="shrink-0 rounded-lg bg-warn/15 px-2.5 py-1 font-mono text-xs font-semibold text-warn">
-                      {item.warning_score.toFixed(2)}
+                      {Number(item.warning_score ?? 0).toFixed(2)}
                     </span>
                   </div>
                   <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                    {item.reasons?.map((reason) => (
+                    {(item.reasons ?? []).map((reason) => (
                       <Badge key={reason} tone="warn">
                         {reason}
                       </Badge>
@@ -245,13 +350,13 @@ export function Timeline() {
                           : 'bg-surface-3/60 text-ink-muted',
                       )}
                     >
-                      {item.score.toFixed(2)}
+                      {Number(item.score ?? 0).toFixed(2)}
                     </span>
                   </div>
                   <div className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-xs text-ink-faint sm:grid-cols-4">
-                    <span>slope {item.slope.toFixed(1)}</span>
-                    <span>mom {item.momentum.toFixed(2)}x</span>
-                    <span>infl {item.influence.toFixed(2)}</span>
+                    <span>slope {Number(item.slope ?? 0).toFixed(1)}</span>
+                    <span>mom {Number(item.momentum ?? 0).toFixed(2)}x</span>
+                    <span>infl {Number(item.influence ?? 0).toFixed(2)}</span>
                     <span>vol {formatNumber(item.current_volume)}</span>
                   </div>
                 </li>
@@ -260,11 +365,36 @@ export function Timeline() {
           ) : (
             <EmptyState
               title="No forecasts"
-              description="Forecasts require populated daily timelines from the pipeline."
+              description="Forecasts require populated timelines from the pipeline."
             />
           )}
         </Panel>
       </div>
+
+      <Panel title="Detected spikes" subtitle="Narratives with sudden volume or momentum shifts">
+        {spikes.length ? (
+          <ul className="grid gap-2.5 md:grid-cols-2">
+            {spikes.slice(0, 12).map((item, index) => (
+              <li
+                key={`${item.narrative}-${index}`}
+                className="rounded-xl border border-line bg-surface/60 px-4 py-3.5"
+              >
+                <p className="text-sm font-medium leading-6 text-ink">
+                  {truncate(item.narrative, 80)}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-3 font-mono text-xs text-ink-faint">
+                  <span>{prettyDate(item.day)}</span>
+                  <span>count {formatNumber(item.count)}</span>
+                  <span>mom {Number(item.momentum ?? 0).toFixed(2)}x</span>
+                  <span>z {Number(item.z_score ?? 0).toFixed(2)}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <EmptyState title="No spikes detected for this corpus window" />
+        )}
+      </Panel>
     </div>
   )
 }

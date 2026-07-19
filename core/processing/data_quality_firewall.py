@@ -38,9 +38,35 @@ class DataQualityFirewall:
         self.report = FirewallReport()
         self._existing_hashes: set[str] = set()
 
-    def validate_batch(self, articles: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        self.report = FirewallReport(attempted=len(articles))
+    def reset_hashes(self) -> None:
         self._existing_hashes = set()
+
+    def seed_hashes(self, articles: list[dict[str, Any]]) -> None:
+        """Remember content hashes for already-accepted articles (resume)."""
+
+        for article in articles:
+            text = self._extract_text(article)
+            if not text:
+                continue
+            _is_duplicate, text_hash = self.is_duplicate(text, set())
+            self._existing_hashes.add(text_hash)
+
+    def validate_batch(
+        self,
+        articles: list[dict[str, Any]],
+        *,
+        reset_hashes: bool = False,
+    ) -> list[dict[str, Any]]:
+        """Validate a batch while optionally preserving prior content hashes.
+
+        Cross-batch deduplication requires the same firewall instance to keep
+        hashes between successive batches. Pass ``reset_hashes=True`` only when
+        starting a brand-new independent corpus.
+        """
+
+        self.report = FirewallReport(attempted=len(articles))
+        if reset_hashes:
+            self.reset_hashes()
         accepted_articles: list[dict[str, Any]] = []
 
         for article in articles:

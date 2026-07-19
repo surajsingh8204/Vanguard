@@ -67,10 +67,10 @@ logger = logging.getLogger(__name__)
 
 class AIPipeline:
 
-    def __init__(self):
+    def __init__(self, embedding_service=None):
 
         print("Loading embedding model...")
-        self.embedding_service = EmbeddingService()
+        self.embedding_service = embedding_service or EmbeddingService()
 
         print("Initializing RAG engine...")
         self.rag = RAGEngine()
@@ -106,13 +106,16 @@ class AIPipeline:
     # BUILD VECTOR DATABASE
     # ---------------------------------------------------
 
-    def build_vector_db(self, articles):
+    def build_vector_db(
+        self,
+        articles,
+        force_rebuild=False,
+        dataset_path="data_lake/processed/enriched_articles.json",
+    ):
 
         print("Building vector database...")
 
         artifact_manager = ArtifactManager()
-
-        dataset_path = "data_lake/processed/enriched_articles.json"
 
         with open(dataset_path, "rb") as f:
             current_hash = hashlib.md5(
@@ -124,7 +127,8 @@ class AIPipeline:
         )
 
         use_cache = (
-            build_info is not None
+            not force_rebuild
+            and build_info is not None
             and build_info.get("dataset_hash") == current_hash
             and build_info.get("retrieval_quality_version") == 2
             and artifact_manager.exists(f"{VECTORSTORE_DIR}/faiss.index")
@@ -641,8 +645,6 @@ class AIPipeline:
         print(
             "\n✅ Clustering artifacts saved."
         )
-
-        dataset_path = "data_lake/processed/enriched_articles.json"
 
         with open(dataset_path, "rb") as f:
             dataset_hash = hashlib.md5(

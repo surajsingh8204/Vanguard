@@ -6,6 +6,8 @@ export type EvaluationSummary = {
     purity_count: number
     label_audit_count: number
     status: string
+    temporal_buckets?: number
+    narrative_count?: number
   }
   coherence: Record<string, number | null>
   purity: Record<string, number | null>
@@ -18,6 +20,8 @@ export type EvaluationSummary = {
   correlation: {
     baseline_correlation?: number | null
     vanguard_correlation?: number | null
+    baseline_samples?: number
+    vanguard_samples?: number
     [key: string]: number | null | undefined
   }
   label_audit:

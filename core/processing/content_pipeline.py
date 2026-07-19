@@ -80,6 +80,11 @@ class ContentPipeline:
         checkpoint = self.batch_processor.load_checkpoint()
         start_batch_index, accepted_articles = self._restore_progress(checkpoint, dataset_name, batches)
         batch_timings: list[float] = []
+        # Preserve content hashes across batches so duplicates are rejected
+        # for the whole run, not only within each 250-record window.
+        self.firewall.reset_hashes()
+        if accepted_articles:
+            self.firewall.seed_hashes(accepted_articles)
 
         for batch_index in range(start_batch_index, len(batches)):
             batch_number = batch_index + 1
@@ -122,7 +127,16 @@ class ContentPipeline:
     def load_articles(self) -> list[dict[str, Any]]:
         print("Loading raw articles...")
         articles = self.raw_loader.load_incremental(max_articles=MAX_ARTICLES_PER_RUN)
+        normalized_articles = self.normalize_articles(articles)
 
+        print(f"Loaded {len(normalized_articles)} raw articles")
+        return normalized_articles
+
+    def normalize_articles(
+        self,
+        articles: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Normalize raw article metadata before bounded batch processing."""
         normalized_articles: list[dict[str, Any]] = []
         for article in articles:
             normalized_article = dict(article)
@@ -131,7 +145,6 @@ class ContentPipeline:
                 normalized_article["formatted_date"] = TimeUtils.format_gdelt_time(raw_time)
             normalized_articles.append(normalized_article)
 
-        print(f"Loaded {len(normalized_articles)} raw articles")
         return normalized_articles
 
     def deduplicate_urls(self, articles: list[dict[str, Any]]) -> list[dict[str, Any]]:

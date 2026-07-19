@@ -1,0 +1,27 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/opt/vanguard/model-cache
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        build-essential \
+        libgomp1 \
+        libxml2-dev \
+        libxslt1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /app/requirements.txt
+RUN python -m pip install --upgrade pip \
+    && python -c "from pathlib import Path; p=Path('/app/requirements.txt'); t=p.read_text(encoding='utf-8-sig'); lines=[ln for ln in t.splitlines() if ' @ file:' not in ln]; p.write_text('\n'.join(lines)+'\n', encoding='utf-8')" \
+    && python -m pip install packaging \
+    && python -m pip install -r /app/requirements.txt
+
+COPY core /app/core
+COPY pipeline /app/pipeline
+
+CMD ["python", "pipeline/run_pipeline.py"]

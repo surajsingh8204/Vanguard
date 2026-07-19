@@ -147,7 +147,11 @@ export function Evaluation() {
   const avgPurity = mean(Object.values(data.purity ?? {}))
   const baseline = data.correlation?.baseline_correlation
   const vanguard = data.correlation?.vanguard_correlation
-  const audits = Array.isArray(data.label_audit) ? data.label_audit : []
+  const audits = Array.isArray(data.label_audit)
+    ? data.label_audit
+    : Object.values(data.label_audit ?? {})
+  const temporalBuckets = Number(data.metadata?.temporal_buckets ?? 0)
+  const narrativeCount = Number(data.metadata?.narrative_count ?? 0)
 
   return (
     <div className="space-y-7">
@@ -158,6 +162,12 @@ export function Evaluation() {
         action={<Badge tone="ok">pipeline {data.metadata.status}</Badge>}
       />
 
+      <div className="rounded-xl border border-line/70 bg-surface/50 px-4 py-3 text-sm text-ink-muted">
+        Temporal coverage: {formatNumber(narrativeCount)} narratives across{' '}
+        {formatNumber(temporalBuckets)} bucket
+        {temporalBuckets === 1 ? '' : 's'}. Forecast correlations populate once the
+        timeline has at least two comparable buckets.
+      </div>
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <Panel bodyClassName="p-4">
           <GaugeChart value={avgCoherence} title="Avg coherence" color="#3ddc97" />
@@ -268,6 +278,12 @@ export function Evaluation() {
                 {formatNumber(Number(data.forecast_evaluation?.baseline_hits ?? 0))}
               </dd>
             </div>
+            <div className="flex justify-between gap-3 border-b border-line/60 pb-3">
+              <dt className="text-ink-muted">Correlation samples</dt>
+              <dd className="font-mono text-lg text-ink">
+                {formatNumber(Number(data.correlation?.vanguard_samples ?? 0))}
+              </dd>
+            </div>
             <div className="flex justify-between gap-3">
               <dt className="text-ink-muted">Clusters audited</dt>
               <dd className="font-mono text-lg text-ink">
@@ -276,8 +292,9 @@ export function Evaluation() {
             </div>
           </dl>
           <p className="mt-5 rounded-xl border border-line/70 bg-surface/60 px-4 py-3 text-xs leading-6 text-ink-faint">
-            Forecast validation requires populated timelines. When temporal artifacts are
-            empty, hit counts remain zero and correlations are undefined.
+            {temporalBuckets < 2
+              ? 'Only one temporal bucket was available before the latest analytics rebuild. Re-run analytics after the hourly/day auto-resolution fix to populate forecast validation.'
+              : 'Forecast validation compares ranked forecast scores against recent growth in the same timeline.'}
           </p>
           <p className="mt-3 font-mono text-xs text-ink-faint">
             avg coherence {formatScore(avgCoherence)} · avg purity {formatScore(avgPurity, 0)}

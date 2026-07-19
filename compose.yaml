@@ -1,0 +1,32 @@
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.pipeline
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_HOME: /opt/vanguard/model-cache
+    volumes:
+      - ./data_lake:/app/data_lake
+      - ./core/artifacts:/app/core/artifacts
+      - ./artifacts:/app/artifacts
+      - vanguard_model_cache:/opt/vanguard/model-cache
+    command: ["python", "pipeline/run_pipeline.py"]
+
+  postgres:
+    image: postgres:16
+    container_name: vanguard-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vanguard
+      POSTGRES_PASSWORD: vanguard123
+      POSTGRES_DB: vanguard_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  vanguard_model_cache:

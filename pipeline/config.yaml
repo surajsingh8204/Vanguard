@@ -1,0 +1,65 @@
+pipeline:
+  name: vanguard-intelligence
+  state_file: artifacts/pipeline/pipeline_state.json
+  workspace_dir: artifacts/pipeline
+  resume: true
+
+ingestion:
+  articles_limit: 5000
+  hours_back: 168
+  batch_size: auto
+  auto_batch:
+    target_batches: 50
+    minimum: 250
+    maximum: 1000
+  save_every_batch: true
+
+preprocessing:
+  batch_size: auto
+  auto_batch:
+    target_batches: 100
+    minimum: 100
+    maximum: 250
+  workers: 10
+  output_path: data_lake/processed/enriched_articles.json
+  stream_read_size_bytes: 1048576
+
+embeddings:
+  model: sentence-transformers/all-MiniLM-L6-v2
+  embedding_batch_size: 64
+  device: auto
+  checkpoint_dir: artifacts/pipeline/embeddings
+  save_every_batch: true
+
+vector_database:
+  vector_db: faiss
+  rebuild_vectors: true
+
+artifacts:
+  rebuild_artifacts: true
+  required:
+    - core/artifacts/vectorstore/faiss.index
+    - core/artifacts/vectorstore/metadata.json
+    - core/artifacts/narrative/clusters.json
+    - core/artifacts/narrative/cluster_labels.json
+    - core/artifacts/narrative/statistics.json
+    - core/artifacts/narrative/timeline.json
+    - core/artifacts/narrative/emerging.json
+    - core/artifacts/narrative/forecasts.json
+    - core/artifacts/narrative/early_warnings.json
+    - core/artifacts/graphs/nodes.json
+    - core/artifacts/graphs/edges.json
+    - core/artifacts/evaluation/coherence.json
+    - core/artifacts/evaluation/purity.json
+    - core/artifacts/evaluation/forecast_evaluation.json
+    - core/artifacts/evaluation/correlation.json
+    - core/artifacts/metadata/executive_brief.json
+    - core/artifacts/metadata/pipeline_status.json
+
+logging:
+  level: INFO
+  directory: artifacts/pipeline/logs
+  filename: pipeline.log
+  console: true
+  rotate_bytes: 10485760
+  backup_count: 5

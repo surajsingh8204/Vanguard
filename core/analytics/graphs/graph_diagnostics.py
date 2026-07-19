@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+from core.utils.time_utils import TimeUtils
+
 
 class GraphDiagnostics:
 
@@ -66,10 +68,14 @@ class GraphDiagnostics:
                 axis=0
             )
 
-            dates = set([
-                x["date"][:8]
-                for x in items
-            ])
+            dates = {
+                day
+                for day in (
+                    TimeUtils.parse_to_day(item.get("date"))
+                    for item in items
+                )
+                if day is not None
+            }
 
             narrative_vectors[cluster_id] = centroid
             narrative_dates[cluster_id] = dates
