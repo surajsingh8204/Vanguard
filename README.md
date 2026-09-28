@@ -81,23 +81,35 @@ React intelligence dashboard + grounded AI chat
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    G[GDELT GKG feeds] --> I[Ingestion]
-    I --> R[Raw data lake]
-    R --> E[Fetch & extract]
-    E --> Q[Purify & validate]
-    Q --> P[Processed articles]
-    P --> M[Sentence Transformer embeddings]
-    M --> C[HDBSCAN narrative clustering]
-    C --> V[FAISS vector store]
-    C --> A[Analytics & evaluation]
-    A --> F[Artifact files]
-    V --> B[FastAPI backend]
-    F --> B
-    D[(PostgreSQL)] --> B
-    B --> W[React + TypeScript frontend]
-    B --> L[Groq grounded generation]
+Vanguard separates the long-running intelligence pipeline from the application layer while connecting ingestion, NLP, retrieval, analytics, RAG, and the web interface into an end-to-end intelligence system.
+
+![Vanguard Architecture](docs/images/vanguard_archi_img.png)
+
+### High-Level Flow
+
+``` text
+GDELT
+  ↓
+Data Ingestion
+  ↓
+Article Extraction & Cleaning
+  ↓
+Sentence Transformer Embeddings
+  ↓
+HDBSCAN Narrative Clustering
+  ↓
+FAISS Vector Store
+  ↓
+Analytics & Evaluation
+  ↓
+Generated Intelligence Artifacts
+  ↓
+FastAPI Backend
+  ├── PostgreSQL
+  ├── RAG Retrieval
+  └── Groq Grounded Generation
+  ↓
+React + TypeScript Dashboard
 ```
 
 ### Separation of responsibilities
